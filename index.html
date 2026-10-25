@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chinese Story Performance Project · Key Stage 2</title>
+<style>
+  :root{
+    --ink:#1f2933; --muted:#616e7c; --line:#e4e7eb; --bg:#f7f9fb;
+    --accent:#b23a48; --accent2:#2f5d8a; --card:#ffffff;
+    --pinyin:#8a4b9c; --english:#4a5568;
+    --radius:14px; --maxw:900px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:"Segoe UI",-apple-system,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+    line-height:1.55;
+  }
+  header.site{
+    background:linear-gradient(135deg,#2f5d8a,#b23a48);
+    color:#fff; padding:34px 20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:20px;
+  }
+  header.site .wrap{max-width:var(--maxw);margin:0 auto; flex:1;}
+  header.site h1{margin:0 0 6px;font-size:1.7rem;letter-spacing:.2px;}
+  header.site p{margin:0;opacity:.92;font-size:.98rem;max-width:640px;}
+  .lang-tag{display:inline-block;font-size:.8rem;background:rgba(255,255,255,.18);
+    padding:3px 10px;border-radius:999px;margin-top:12px;letter-spacing:.3px;}
+  
+  .qr-container{background:#fff; padding:10px; border-radius:10px; text-align:center; color:#000; font-size:0.8rem; font-weight:bold;}
+  .qr-container img{width:100px; height:100px; display:block; margin-bottom:5px;}
+
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 20px;}
+
+  /* Tabs */
+  nav.tabs{
+    position:sticky;top:0;z-index:20;background:#fff;
+    border-bottom:1px solid var(--line);box-shadow:0 2px 6px rgba(0,0,0,.04);
+  }
+  nav.tabs .wrap{display:flex;gap:6px;overflow-x:auto;padding:0 20px;}
+  nav.tabs button{
+    flex:0 0 auto;background:none;border:none;cursor:pointer;
+    padding:14px 16px;font-size:.95rem;color:var(--muted);
+    border-bottom:3px solid transparent;font-weight:600;white-space:nowrap;
+  }
+  nav.tabs button:hover{color:var(--ink);}
+  nav.tabs button.active{color:var(--accent);border-bottom-color:var(--accent);}
+
+  /* Panels */
+  .panel{display:none;padding:28px 0 60px;}
+  .panel.active{display:block;}
+
+  /* Home */
+  .lead{font-size:1.05rem;color:var(--muted);max-width:680px;}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;margin-top:24px;}
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:20px;cursor:pointer;transition:.18s;position:relative;overflow:hidden;
+    box-shadow:0 1px 2px rgba(0,0,0,.04); display:flex; flex-direction:column; justify-content:center;
+  }
+  .card:hover{transform:translateY(-3px);box-shadow:0 8px 22px rgba(0,0,0,.08);border-color:#cbd2d9;}
+  .card .num{font-size:.75rem;font-weight:700;color:var(--accent);letter-spacing:1px;text-transform:uppercase; margin-bottom:8px;}
+  
+  /* Card Titles: Pinyin Above, Chinese Middle, English Below */
+  .card-title-box { text-align: left; margin-bottom: 8px;}
+  .card-title-box .py-title { color:var(--pinyin); font-style: italic; font-size: 1rem; display: block; margin-bottom: 2px;}
+  .card-title-box h3 { margin: 0; font-size: 1.35rem; color: var(--ink);}
+  
+  .card .en{color:var(--english);font-size:.95rem;margin-top:6px;}
+  .card .badge{position:absolute;top:14px;right:14px;font-size:.7rem;background:#eef2f6;
+    color:var(--muted);padding:3px 8px;border-radius:999px;font-weight:600;}
+
+  /* Story page */
+  .story-header-container { display: flex; gap: 20px; align-items: flex-start; margin-bottom: 20px; flex-wrap: wrap; }
+  .story-image { width: 150px; height: 150px; object-fit: cover; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+  
+  .story-head{flex: 1; display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap; border-bottom:2px solid var(--line);padding-bottom:18px;}
+  
+  /* Aligning the title perfectly */
+  .story-title-box { text-align: center; }
+  .story-title-box .py-title { color:var(--pinyin); font-style: italic; font-size: 1.1rem; margin-bottom: -5px; display: block; }
+  .story-title-box h2 { margin: 0; font-size: 1.8rem; }
+  .story-title-box .en-title { color:var(--english); font-size: 1rem; margin-top: 2px; display: block; }
+
+  .btn-group { display: flex; gap: 10px; }
+  .btn{
+    background:var(--accent2);color:#fff;border:none;border-radius:10px;
+    padding:10px 16px;font-size:.9rem;font-weight:600;cursor:pointer;transition:.15s;
+  }
+  .btn:hover{filter:brightness(1.08);}
+  .btn.play-all { background: var(--accent); }
+
+  .scene{margin-top:28px;}
+  .scene-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--line); padding-bottom: 8px; margin-bottom: 12px; }
+  .scene h4{margin:0;font-size:.85rem;letter-spacing:1.4px;text-transform:uppercase;color:var(--accent);}
+  
+  .line{
+    background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent2);
+    border-radius:10px;padding:14px 16px;margin-bottom:12px; position: relative;
+  }
+  
+  /* Pinyin above Chinese styling */
+  ruby { ruby-align: center; display: inline-block; }
+  rt { font-size: 0.65em; color: var(--pinyin); font-style: italic; font-family: Arial, sans-serif; font-weight: normal; padding-bottom: 2px; }
+
+  .line .cn{font-size:1.3rem;font-weight:600;letter-spacing:.3px;line-height:2; padding-right: 40px;}
+  .line .en{color:var(--english);font-size:.95rem;margin-top:8px; padding-right: 40px; border-top:1px dashed #e4e7eb; padding-top:8px;}
+  
+  .audio-btn {
+    position: absolute; right: 14px; top: 14px;
+    background: #eef2f6; border: none; border-radius: 50%; width: 32px; height: 32px;
+    display: flex; justify-content: center; align-items: center; cursor: pointer;
+    font-size: 1.1rem; transition: 0.2s; color: var(--accent2);
+  }
+  .audio-btn:hover { background: #dce4ec; transform: scale(1.1); }
+  .audio-btn.playing { background: #b23a48; color: white; animation: pulse 1s infinite; }
+  @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+
+  /* Print */
+  @media print{
+    nav.tabs, header.site, .btn, .audio-btn, .no-print{display:none !important;}
+    body{background:#fff; font-size: 12pt;}
+    .panel{display:none !important;padding:0;}
+    .panel.active{display:block !important;}
+    .line{break-inside:avoid;border-left-color:#ccc;box-shadow:none; padding: 10px 0; border: none; border-bottom: 1px solid #ddd; border-radius: 0;}
+    .line .cn { font-size: 16pt; line-height: 2; }
+    .line .en { font-size: 11pt; margin-top: 10px; padding-top: 5px; border-top: none; color: #444; }
+    rt { font-size: 0.6em; }
+    .scene{break-inside:auto; margin-top: 20px;}
+    .print-header{display:block !important;margin-bottom:16px; font-family: sans-serif; font-size: 10pt; color: #666;}
+    .scene-header { border-bottom: 2px solid #000; padding-bottom: 4px; margin-bottom: 10px;}
+    .story-image { display: none; } 
+  }
+  .print-header{display:none;}
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap">
+    <h1>Chinese Story Performance Project</h1>
+    <p>Turning familiar stories into simple Chinese performance scripts — learn the lines, create the actions, perform the story.</p>
+    <span class="lang-tag">Key Stage 2 · Mandarin learning · Story-based project</span>
+  </div>
+  <div class="qr-container" id="qr-code-container">
+    <!-- QR Code will be generated here -->
+    <div>Scan for home practice</div>
+  </div>
+</header>
+
+<nav class="tabs">
+  <div class="wrap">
+    <button data-tab="home" class="active">🏠 Home</button>
+    <button data-tab="billy">1 · 比利的甲壳虫</button>
+    <button data-tab="paddington">2 · 帕丁顿游览伦敦</button>
+    <button data-tab="jim">3 · 杰姆与仙豆</button>
+    <button data-tab="lost">4 · 迷失与找到</button>
+    <button data-tab="journey">5 · 回家之旅</button>
+    <button data-tab="flower">6 · 开花大楼</button>
+  </div>
+</nav>
+
+<!-- ================= HOME ================= -->
+<section class="panel active" id="home">
+  <div class="wrap">
+    <p class="lead">Each story is written for young beginners: short lines, a repeated refrain the whole class can chant, actable vocabulary, and pinyin + English alongside every line. Click the 🔊 icon to hear the pronunciation. Choose a story to rehearse, or print it for the classroom.</p>
+
+    <div class="cards">
+      <div class="card" data-goto="billy">
+        <span class="badge">Autumn 1</span>
+        <div class="num">Story 1</div>
+        <div class="card-title-box">
+          <span class="py-title">Bǐlì de Jiǎkéchóng</span>
+          <h3>比利的甲壳虫</h3>
+        </div>
+        <div class="en">Billy's Beetle — a boy loses his beetle, and a clever hedgehog finds it.</div>
+      </div>
+      
+      <div class="card" data-goto="paddington">
+        <span class="badge">Autumn 2</span>
+        <div class="num">Story 2</div>
+        <div class="card-title-box">
+          <span class="py-title">Pàdīngdùn Yóulǎn Lúndūn</span>
+          <h3>帕丁顿游览伦敦</h3>
+        </div>
+        <div class="en">Paddington Visits London — a walk across London to hear Big Ben chime.</div>
+      </div>
+      
+      <div class="card" data-goto="jim">
+        <span class="badge">Spring 1</span>
+        <div class="num">Story 3</div>
+        <div class="card-title-box">
+          <span class="py-title">Jiémǔ yǔ Xiāndòu</span>
+          <h3>杰姆与仙豆</h3>
+        </div>
+        <div class="en">Jim and the Beanstalk — a giant needs new teeth and Jim runs for his life.</div>
+      </div>
+      
+      <div class="card" data-goto="lost">
+        <span class="badge">Spring 2</span>
+        <div class="num">Story 4</div>
+        <div class="card-title-box">
+          <span class="py-title">Míshī yǔ Zhǎodào</span>
+          <h3>迷失与找到</h3>
+        </div>
+        <div class="en">Lost and Found — a boy helps a lost penguin get back to the South Pole.</div>
+      </div>
+      
+      <div class="card" data-goto="journey">
+        <span class="badge">Summer 1</span>
+        <div class="num">Story 5</div>
+        <div class="card-title-box">
+          <span class="py-title">Huíjiā zhī Lǚ</span>
+          <h3>回家之旅</h3>
+        </div>
+        <div class="en">The Journey Home — animals search for a new home on a melting planet.</div>
+      </div>
+      
+      <div class="card" data-goto="flower">
+        <span class="badge">Summer 2</span>
+        <div class="num">Story 6</div>
+        <div class="card-title-box">
+          <span class="py-title">Kāihuā Dàlóu</span>
+          <h3>开花大楼</h3>
+        </div>
+        <div class="en">Flower Block — one boy's magical sunflower brings a tower block together.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 1. BILLY'S BEETLE ================= -->
+<section class="panel" id="billy">
+  <div class="wrap">
+    <div class="print-header"><strong>Chinese Story Performance Project · Rehearsal Script</strong></div>
+
+    <div class="story-header-container">
+      <img src="https://images.unsplash.com/photo-1596702716918-ec0b43b1b449?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Billy's Beetle" class="story-image">
+      <div class="story-head">
+        <div class="story-title-box">
+          <span class="py-title">Bǐlì de Jiǎkéchóng</span>
+          <h2>比利的甲壳虫</h2>
+          <span class="en-title">Billy's Beetle</span>
+        </div>
+        <div class="btn-group">
+          <button class="btn" onclick="window.print()">🖨 Print / Save as PDF</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="scene">
+      <div class="scene-header">
+        <h4>Scene 1 · Opening 开场</h4>
+        <button class="btn play-all" onclick="playScene('billy', 1)">▶ Play Scene</button>
+      </div>
+      <div class="line" data-audio="从前，有一个小男孩叫比利。他的甲壳虫住在火柴盒里。">
+        <div class="cn"><ruby>从<rt>cóng</rt></ruby><ruby>前<rt>qián</rt></ruby>，<ruby>有<rt>yǒu</rt></ruby><ruby>一<rt>yí</rt></ruby><ruby>个<rt>ge</rt></ruby><ruby>小<rt>xiǎo</rt></ruby><ruby>男<rt>nán</rt></ruby><ruby>孩<rt>hái</rt></ruby><ruby>叫<rt>jiào</rt></ruby><ruby>比<rt>Bǐ</rt></ruby><ruby>利<rt>lì</rt></ruby>。<ruby>他<rt>tā</rt></ruby><ruby>的<rt>de</rt></ruby><ruby>甲<rt>jiǎ</rt></ruby><ruby>壳<rt>ké</rt></ruby><ruby>虫<rt>chóng</rt></ruby><ruby>住<rt>zhù</rt></ruby><ruby>在<rt>zài</rt></ruby><ruby>火<rt>huǒ</rt></ruby><ruby>柴<rt>chái</rt></ruby><ruby>盒<rt>hé</rt></ruby><ruby>里<rt>lǐ</rt></ruby>。</div>
+        <div class="en">Once upon a time, there was a little boy called Billy. His beetle lived in a matchbox.</div>
+        <button class="audio-btn" onclick="toggleAudio(this)">🔊</button>
+      </div>
+      <div class="line" data-audio="有一天，比利去散步。哎呀！甲壳虫丢了！傻傻的比利！">
+        <div class="cn"><ruby>有<rt>yǒu</rt></ruby><ruby>一<rt>yì</rt></ruby><ruby>天<rt>tiān</rt></ruby>，<ruby>比<rt>Bǐ</rt></ruby><ruby>利<rt>lì</rt></ruby><ruby>去<rt>qù</rt></ruby><ruby>散<rt>sàn</rt></ruby><ruby>步<rt>bù</rt></ruby>。<ruby>哎<rt>āi</rt></ruby><ruby>呀<rt>yā</rt></ruby>！<ruby>甲<rt>jiǎ</rt></ruby><ruby>壳<rt>ké</rt></ruby><ruby>虫<rt>chóng</rt></ruby><ruby>丢<rt>diū</rt></ruby><ruby>了<rt>le</rt></ruby>！<ruby>傻<rt>shǎ</rt></ruby><ruby>傻<rt>shǎ</rt></ruby><ruby>的<rt>de</rt></ruby><ruby>比<rt>Bǐ</rt></ruby><ruby>利<rt>lì</rt></ruby>！</div>
+        <div class="en">One day, Billy went for a walk. Oh no! The beetle was lost! Silly Billy!</div>
+        <button class="audio-btn" onclick="toggleAudio(this)">🔊</button>
+      </div>
+    </div>
+
+    <div class="scene">
+      <div class="scene-header">
+        <h4>Scene 2 · The Search 寻找</h4>
+        <button class="btn play-all" onclick="playScene('billy', 2)">▶ Play Scene</button>
+      </div>
+      <div class="line" data-audio="比利找啊找，找啊找，找不到甲壳虫。">
+        <div class="cn"><ruby>比<rt>Bǐ</rt></ruby><ruby>利<rt>lì</rt></ruby><ruby>找<rt>zhǎo</rt></ruby><ruby>啊<rt>a</rt></ruby><ruby>找<rt>zhǎo</rt></ruby>，<ruby>找<rt>zhǎo</rt></ruby><ruby>啊<rt>a</rt></ruby><ruby>找<rt>zhǎo</rt></ruby>，<ruby>找<rt>zhǎo</rt></ruby><ruby>不<rt>bu</rt></ruby><ruby>到<rt>dào</rt></ruby><ruby>甲<rt>jiǎ</rt></ruby><ruby>壳<rt>ké</rt></ruby><ruby>虫<rt>chóng</rt></ruby>。</div>
+        <div class="en">Billy searched and searched and searched, but he could not find the beetle.</div>
+        <button class="audio-btn" onclick="toggleAudio(this)">🔊</button>
+      </div>
+      <div class="line" data-audio="他看见一个男人和一只狗。狗闻啊闻，找不到甲壳虫。">
+        <div class="cn"><ruby>他<rt>tā</rt></ruby><ruby>看<rt>kàn</rt></ruby><ruby>见<rt>jiàn</rt></ruby><ruby>一<rt>yí</rt></ruby><ruby>个<rt>ge</rt></ruby><ruby>男<rt>nán</rt></ruby><ruby>人<rt>rén</rt></ruby><ruby>和<rt>hé</rt></ruby><ruby>一<rt>yì</rt></ruby><ruby>只<rt>zhī</rt></ruby><ruby>狗<rt>gǒu</rt></ruby>。<ruby>狗<rt>gǒu</rt></ruby><ruby>闻<rt>wén</rt></ruby><ruby>啊<rt>a</rt></ruby><ruby>闻<rt>wén</rt></ruby>，<ruby>找<rt>zhǎo</rt></ruby><ruby>不<rt>bu</rt></ruby><ruby>到<rt>dào</rt></ruby><ruby>甲<rt>jiǎ</rt></ruby><ruby>壳<rt>ké</rt></ruby><ruby>虫<rt>chóng</rt></ruby>。</div>
+        <div class="en">He met a man with a sniffy dog. The dog sniffed and sniffed, but could not find the beetle.</div>
+        <button class="audio-btn" onclick="toggleAudio(this)">🔊</button>
+      </div>
+      <div class="line" data-audio="他们看见一只刺猬，身上有尖尖的刺。刺猬找啊找，找不到甲壳虫。">
+        <div class="cn"><ruby>他<rt>tā</rt></ruby><ruby>们<rt>men</rt></ruby><ruby>看<rt>kàn</rt></ruby><ruby>见<rt>jiàn</rt></ruby><ruby>一<rt>yì</rt></ruby><ruby>只<rt>zhī</rt></ruby><ruby>刺<rt>cì</rt></ruby><ruby>猬<rt>wei</rt></ruby>，<ruby>身<rt>shēn</rt></ruby><ruby>上<rt>shang</rt></ruby><ruby>有<rt>yǒu</rt></ruby><ruby>尖<rt>jiān</rt></ruby><ruby>尖<rt>jiān</rt></ruby><ruby>的<rt>de</rt></ruby><ruby>刺<rt>cì</rt></ruby>。<ruby>刺<rt>cì</rt></ruby><ruby>猬<rt>wei</rt></ruby><ruby>找<rt>zhǎo</rt></ruby><ruby>啊<rt>a</rt></ruby><ruby>找<rt>zhǎo</rt></ruby>，<ruby>找<rt>zhǎo</rt></ruby><ruby>不<rt>bu</rt></ruby><ruby>到<rt>dào</rt></ruby><ruby>甲<rt>jiǎ</rt></ruby><ruby>壳<rt>ké</rt></ruby><ruby>虫<rt>chóng</rt></ruby>。</div>
+        <div class="en">They met a hedgehog with sharp prickles. The hedgehog searched and searched, but could not find the beetle.</div>
+        <button class="audio-btn" onclick="toggleAudio(this)">🔊</button>
+      </div>
+    </div>
+
+    <div class="scene">
+      <div class="scene-header">
+        <h4>Scene 3 · Meeting Friends 遇见朋友</h4>
+        <button class="btn play-all" onclick="playScene('billy', 3)">▶ Play Scene</button>
+      </div>
+      <div class="line" data-audio="他们看见一位老奶奶，她有软软的香肠。哎呀！狗狗偷吃了香肠！">
+        <div class="cn"><ruby>他<rt>tā</rt></ruby><ruby>们<rt>men</rt></ruby><ruby>看<rt>kàn</rt></ruby><ruby>见<rt>jiàn</rt></ruby><ruby>一<rt>yí</rt></ruby><ruby>位<rt>wèi</rt></ruby><ruby>老<rt>lǎo</rt></ruby><ruby>奶<rt>nǎi</rt></ruby><ruby>奶<rt>nai</rt></ruby>，<ruby>她<rt>tā</rt></ruby><ruby>有<rt>yǒu</rt></ruby><ruby>软<rt>ruǎn</rt></ruby><ruby>软<rt>ruǎn</rt></ruby><ruby>的<rt>de</rt></ruby><ruby>香<rt>xiāng</rt></ruby><ruby>肠<rt>cháng</rt></ruby>。<ruby>哎<rt>āi</rt></ruby><ruby>呀<rt>yā</rt></ruby>！<ruby>狗<rt>gǒu</rt></ruby><ruby>狗<rt>gǒu</rt></ruby><ruby>偷<rt>tōu</rt></ruby><ruby>吃<rt>chī</rt></ruby><ruby>了<rt>le</rt></ruby><ruby>香<rt>xiāng</rt></ruby><ruby>肠<rt>cháng</rt></ruby>！</div>
+        <div class="en">They met an old lady with some squidgy sausages. Oh no! The dog gobbled up the sausages!</div>
+        <button class="audio-btn" onclick="toggleAudio(this)">🔊</button>
+      </div>
+      <div class="line" data-audio="他们看见一只北极熊、一支乐队和一头很大很大的大象。大家找啊找，找不到甲壳虫。">
+        <div class="cn"><ruby>他<rt>tā</rt></ruby><ruby>们<rt>men</rt></ruby><ruby>看<rt>kàn</rt></ruby><ruby>见<rt>jiàn</rt></ruby><ruby>一<rt>yì</rt></ruby><ruby>只<rt>zhī</rt></ruby><ruby>北<rt>běi</rt></ruby><ruby>极<rt>jí</rt></ruby><ruby>熊<rt>xióng</rt></ruby>、<ruby>一<rt>yì</rt></ruby><ruby>支<rt>zhī</rt></ruby><ruby>乐<rt>yuè</rt></ruby><ruby>队<rt>duì</rt></ruby><ruby>和<rt>hé</rt></ruby><ruby>一<rt>yì</rt></ruby><ruby>头<rt>tóu</rt></ruby><ruby>很<rt>hěn</rt></ruby><ruby>大<rt>dà</rt></ruby><ruby>很<rt>hěn</rt></ruby><ruby>大<rt>dà</rt></ruby><ruby>的<rt>de</rt></ruby><ruby>大<rt>dà</rt></ruby><ruby>象<rt>xiàng</rt></ruby>。<ruby>大<rt>dà</rt></ruby><ruby>家<rt>jiā</rt></ruby><ruby>找<rt>zhǎo</rt></ruby><ruby>啊<rt>a</rt></ruby><ruby>找<rt>zhǎo</rt></ruby>，<ruby>找<rt>zhǎo</rt></ruby><ruby>不<rt>bu</rt></ruby><ruby>到<rt>dào</rt></ruby><ruby>甲<rt>jiǎ</rt></ruby><ruby>壳<rt>ké</rt></ruby><ruby>虫<rt>chóng</rt></ruby>。</div>
+        <div class="en">They met a polar bear, a band and an enormous elephant. Everyone searched and searched, but could not find the beetle.</div>
+        <button class="audio-btn" onclick="toggleAudio(this)">🔊</button>
+      </div>
+    </div>
+
+    <div class="scene">
+      <div class="scene-header">
+        <h4>Scene 4 · The Ending 结尾</h4>
+        <button class="btn play-all" onclick="playScene('billy', 4)">▶ Play Scene</button>
+      </div>
+      <div class="line" data-audio="大家坐下来，很难过。聪明的刺猬看一看：上！下！中间！">
+        <div class="cn"><ruby>大<rt>dà</rt></ruby><ruby>家<rt>jiā</rt></ruby><ruby>坐<rt>zuò</rt></ruby><ruby>下<rt>xià</rt></ruby><ruby>来<rt>lai</rt></ruby>，<ruby>很<rt>hěn</rt></ruby><ruby>难<rt>nán</rt></ruby><ruby>过<rt>guò</rt></ruby>。<ruby>聪<rt>cōng</rt></ruby><ruby>明<rt>ming</rt></ruby><ruby>的<rt>de</rt></ruby><ruby>刺<rt>cì</rt></ruby><ruby>猬<rt>wei</rt></ruby><ruby>看<rt>kàn</rt></ruby><ruby>一<rt>yi</rt></ruby><ruby>看<rt>kàn</rt></ruby>：<ruby>上<rt>shàng</rt></ruby>！<ruby>下<rt>xià</rt></ruby>！<ruby>中<rt>zhōng</rt></ruby><ruby>间<rt>jiān</rt></ruby>！</div>
+        <div class="en">Sadly, everyone sat down. The clever hedgehog looked — up! Down! In between!</div>
+        <button class="audio-btn" onclick="toggleAudio(this)">🔊</button>
+      </div>
+      <div class="line" data-audio="哇！找到了！甲壳虫在狗狗的头上！万岁！大家都很开心。">
+        <div class="cn"><ruby>哇<rt>wa</rt></ruby>！<ruby>找<rt>zhǎo</rt></ruby><ruby>到<rt>dào</rt></ruby><ruby>了<rt>le</rt></ruby>！<ruby>甲<rt>jiǎ</rt></ruby><ruby>壳<rt>ké</rt></ruby><ruby>虫<rt>chóng</rt></ruby><ruby>在<rt>zài</rt></ruby><ruby>狗<rt>gǒu</rt></ruby><ruby>狗<rt>gǒu</rt></ruby><ruby>的<rt>de</rt></ruby><ruby>头<rt>tóu</rt></ruby><ruby>上<rt>shang</rt></ruby>！<ruby>万<rt>wàn</rt></ruby><ruby>岁<rt>suì</rt></ruby>！<ruby>大<rt>dà</rt></ruby><ruby>家<rt>jiā</rt></ruby><ruby>都<rt>dōu</rt></ruby><ruby>很<rt>hěn</rt></ruby><ruby>开<rt>kāi</rt></ruby><ruby>心<rt>xīn</rt></ruby>。</div>
+        <div class="en">Wow! Found it! The beetle was on the dog's head! Hooray! Everyone was happy.</div>
+        <button class="audio-btn" onclick="toggleAudio(this)">🔊</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 2. PADDINGTON ================= -->
+<section class="panel" id="paddington">
+  <div class="wrap">
+    <div class="print-header"><strong>Chinese Story Performance Project · Rehearsal Script</strong></div>
+
+    <div class="story-header-container">
+      <img src="https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Paddington Visits London" class="story-image">
+      <div class="story-head">
+        <div class="story-title-box">
+          <span class="py-title">Pàdīngdùn Yóulǎn Lúndūn</span>
+          <h2>帕丁顿游览伦敦</h2>
+          <span class="en-title">Paddington Visits London</span>
+        </div>
+        <div class="btn-group">
+          <button class="btn" onclick="window.print()">🖨 Print / Save as PDF</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="scene">
+      <div class="scene-header">
+        <h4>Scene 1 · Opening 开场</h4>
+        <button class="btn play-all" onclick="playScene('paddington', 1)">▶ Play Scene</button>
+      </div>
+      <div class="line" data-audio="从前，有一只小熊叫帕丁顿，他和布朗先生、布朗太太住在温莎花园。">
+        <div class="cn"><ruby>从<rt>cóng</rt></ruby><ruby>前<rt>qián</rt></ruby>，<ruby>有<rt>yǒu</rt></ruby><ruby>一<rt>yì</rt></ruby><ruby>只<rt>zhī</rt></ruby><ruby>小<rt>xiǎo</rt></ruby><ruby>熊<rt>xióng</rt></ruby><ruby>叫<rt>jiào</rt></ruby><ruby>帕<rt>Pà</rt></ruby><ruby>丁<rt>dīng</rt></ruby><ruby>顿<rt>dùn</rt></ruby>，<ruby>他<rt>tā</rt></ruby><ruby>和<rt>hé</rt></ruby><ruby>布<rt>Bù</rt></ruby><ruby>朗<rt>lǎng</rt></ruby><ruby>先<rt>xiān</rt></ruby><ruby>生<rt>sheng</rt></ruby>、<ruby>布<rt>Bù</rt></ruby><ruby>朗<rt>lǎng</rt></ruby><ruby>太<rt>tài</rt></ruby><ruby>太<rt>tai</rt></ruby><ruby>住<rt>zhù</rt></ruby><ruby>在<rt>zài</rt></ruby><ruby>温<rt>Wēn</rt></ruby><ruby>莎<rt>shā</rt></ruby><ruby>花<rt>Huā</rt></ruby><ruby>园<rt>yuán</rt></ruby>。</div>
+        <div class="en">Once upon a time, there was a little bear called Paddington who lived with Mr and Mrs Brown on Windsor Gardens.</div>
+        <button class="audio-btn" onclick="toggleAudio(this)">🔊</button>
+      </div>
+      <div class="line" data-audio="一天下午，他们出发去伦敦看大本钟。">
+        <div class="cn"><ruby>一<rt>yì</rt></ruby><ruby>天<rt>tiān</rt></ruby><ruby>下<rt>xià</rt></ruby><ruby>午<rt>wǔ</rt></ruby>，<ruby>他<rt>tā</rt></ruby><ruby>们<rt>men</rt></ruby><ruby>出<rt>chū</rt></ruby><ruby>发<rt>fā</rt></ruby><ruby>去<rt>qù</rt></ruby><ruby>伦<rt>Lún</rt></ruby><ruby>敦<rt>dūn</rt></ruby><ruby>看<rt>kàn</rt></ruby><ruby>大<rt>Dà</rt></ruby><ruby>本<rt>běn</rt></ruby><ruby>钟<rt>zhōng</rt></ruby>。</div>
+        <div class="en">Early one afternoon, they set off across London to see Big Ben.</div>
+        <button class="audio-btn" onclick="toggleAudio(this)">🔊</button>
+      </div>
+    </div>
+
+    <div class="scene">
+      <div class="scene-header">
+        <h4>Scene 2 · The Journey 出发啦</h4>
+        <button class="btn play-all" onclick="playScene('paddington', 2)">▶ Play Scene</button>
+      </div>
+      <div class="line" data-audio="首先，他们走过灰蒙蒙的房子。房子很高，窗户很长。">
+        <div class="cn"><ruby>首<rt>shǒu</rt></ruby><ruby>先<rt>xiān</rt></ruby>，<ruby>他<rt>tā</rt></ruby><ruby>们<rt>men</rt></ruby><ruby>走<rt>zǒu</rt></ruby><ruby>过<rt>guò</rt></ruby><ruby>灰<rt>huī</rt></ruby><ruby>蒙<rt>méng</rt></ruby><ruby>蒙<rt>méng</rt></ruby><ruby>的<rt>de</rt></ruby><ruby>房<rt>fáng</rt></ruby><ruby>子<rt>zi</rt></ruby>。<ruby>房<rt>fáng</rt></ruby><ruby>子<rt>zi</rt></ruby><ruby>很<rt>hěn</rt></ruby><ruby>高<rt>gāo</rt></ruby>，<ruby>窗<rt>chuāng</rt></ruby><ruby>户<rt>hu</rt></ruby><ruby>很<rt>hěn</rt></ruby><ruby>长<rt>cháng</rt></ruby>。</div>
+        <div class="en">First, they walked past the dusty houses. They were tall with long windows.</div>
+        <button class="audio-btn" onclick="toggleAudio(this)">🔊</button>
+      </div>
+      <div class="line" data-audio="接着，他们穿过吵闹的公园。孩子们在秋千上大叫。">
+        <div class="cn"><ruby>接<rt>jiē</rt></ruby><ruby>着<rt>zhe</rt></ruby>，<ruby>他<rt>tā</rt></ruby><ruby>们<rt>men</rt></ruby><ruby>穿<rt>chuān</rt></ruby><ruby>过<rt>guò</rt></ruby><ruby>吵<rt>chǎo</rt></ruby><ruby>闹<rt>nào</rt></ruby><ruby>的<rt>de</rt></ruby><ruby>公<rt>gōng</rt></ruby><ruby>园<rt>yuán</rt></ruby>。<ruby>孩<rt>hái</rt></ruby><ruby>子<rt>zi</rt></ruby><ruby>们<rt>men</rt></ruby><ruby>在<rt>zài</rt></ruby><ruby>秋<rt>qiū</rt></ruby><ruby>千<rt>qiān</rt></ruby><ruby>上<rt>shang</rt></ruby><ruby>大<rt>dà</rt></ruby><ruby>叫<rt>jiào</rt></ruby>。</div>
+        <div class="en">Next, they walked through the noisy park. There were screaming children on the swings.</div>
+        <button class="audio-btn" onclick="toggleAudio(this)">🔊</button>
+      </div>
+      <div class="line" data-audio="后来，他们沿着浑浊的河走。河水闻起来像臭鸡蛋。">
+        <div class="cn"><ruby>后<rt>hòu</rt></ruby><ruby>来<rt>lái</rt></ruby>，<ruby>他<rt>tā</rt></ruby><ruby>们<rt>men</rt></ruby><ruby>沿<rt>yán</rt></ruby><ruby>着<rt>zhe</rt></ruby><ruby>浑<rt>hún</rt></ruby><ruby>浊<rt>zhuó</rt></ruby><ruby>的<rt>de</rt></ruby><ruby>河<rt>hé</rt></ruby><ruby>走<rt>zǒu</rt></ruby>。<ruby>河<rt>hé</rt></ruby><ruby>水<rt>shuǐ</rt></ruby><ruby>闻<rt>wén</rt></ruby><ruby>起<rt>qǐ</rt></ruby><ruby>来<rt>lai</rt></ruby><ruby>像<rt>xiàng</rt></ruby><ruby>臭<rt>chòu</rt></ruby><ruby>鸡<rt>jī</rt></ruby><ruby>蛋<rt>dàn</rt></ruby>。</div>
+        <div class="en">After that, they walked along the murky river. It smelled like rotten eggs.</div>
+        <button class="audio-btn" onclick="toggleAudio(this)">🔊</button>
+      </div>
+    </div>
+
+    <div class="scene">
+      <div class="scene-header">
+        <h4>Scene 3 · Big Ben 大本钟</h4>
+        <button class="btn play-all" onclick="playScene('paddington', 3)">▶ Play Scene</button>
+      </div>
+      <div class="line" data-audio="最后，他们到了大本钟。大本钟正好敲了三下。当！当！当！">
+        <div class="cn"><ruby>最<rt>zuì</rt></ruby><ruby>后<rt>hòu</rt></ruby>，<ruby>他<rt>tā</rt></ruby><ruby>们<rt>men</rt></ruby><ruby>到<rt>dào</rt></ruby><ruby>了<rt>le</rt></ruby><ruby>大<rt>Dà</rt></ruby><ruby>本<rt>běn</rt></ruby><ruby>钟<rt>zhōng</rt></ruby>。<ruby>大<rt>Dà</rt></ruby><ruby>本<rt>běn</rt></ruby><ruby>钟<rt>zhōng</rt></ruby><ruby>正<rt>zhèng</rt></ruby><ruby>好<rt>hǎo</rt></ruby><ruby>敲<rt>qiāo</rt></ruby><ruby>了<rt>le</rt></ruby><ruby>三<rt>sān</rt></ruby><ruby>下<rt>xià</rt></ruby>。<ruby>当<rt>dāng</rt></ruby>！<ruby>当<rt>dāng</rt></ruby>！<ruby>当<rt>dāng</rt></ruby>！</div>
+        <div class="en">Finally, they arrived at Big Ben just as it chimed three times. Bong! Bong! Bong!</div>
+        <button class="audio-btn" onclick="toggleAudio(this)">🔊</button>
+      </div>
+      <div class="line" data-audio="真幸运，到了吃点心的时间，帕丁顿大口吃了一个橘子酱三明治。">
+        <div class="cn"><ruby>真<rt>zhēn</rt></ruby><ruby>幸<rt>xìng</rt></ruby><ruby>运<rt>yùn</rt></ruby>，<ruby>到<rt>dào</rt></ruby><ruby>了<rt>le</rt></ruby><ruby>吃<rt>chī</rt></ruby><ruby>点<rt>diǎn</rt></ruby><ruby>心<rt>xin</rt></ruby><ruby>的<rt>de</rt></ruby><ruby>时<rt>shí</rt></ruby><ruby>间<rt>jiān</rt></ruby>，<ruby>帕<rt>Pà</rt></ruby><ruby>丁<rt>dīng</rt></ruby><ruby>顿<rt>dùn</rt></ruby><ruby>大<rt>dà</rt></ruby><ruby>口<rt>kǒu</rt></ruby><ruby>吃<rt>chī</rt></ruby><ruby>了<rt>le</rt></ruby><ruby>一<rt>yí</rt></ruby><ruby>个<rt>ge</rt></ruby><ruby>橘<rt>jú</rt></ruby><ruby>子<rt>zi</rt></ruby><ruby>酱<rt>jiàng</rt></ruby><ruby>三<rt>sān</rt></ruby><ruby>明<rt>míng</rt></ruby><ruby>治<rt>zhì</rt></ruby>。</div>
+        <div class="en">Luckily, it was time for a snack so Paddington gobbled up a marmalade sandwich.</div>
+        <button class="audio-btn" onclick="toggleAudio(this)">🔊</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 3. JIM AND THE BEANSTALK ================= -->
+<section class="panel" id="jim">
+  <div class="wrap">
+    <div class="print-header"><strong>Chinese Story Performance Project · Rehearsal Script</strong></div>
+
+    <div class="story-header-container">
+      <img src="https://images.unsplash.com/photo-1599839619722-39751411ea63?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Jim and the Beanstalk" class="story-image">
+      <div class="story-head">
+        <div class="story-title-box">
+          <span class="py-title">Jiémǔ yǔ Xiāndòu</span>
+          <h2>杰姆与仙豆</h2>
+          <span class="en-title">Jim and the Beanstalk</span>
+        </div>
+        <div class="btn-group">
+          <button class="btn" onclick="window.print()">🖨 Print / Save as PDF</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="scene">
+      <div class="scene-header">
+        <h4>Scene 1 · The Problem 问题</h4>
+        <button class="btn play-all" onclick="playScene('jim', 1)">▶ Play Scene</button>
+      </div>
+      <div class="line" data-audio="很久很久以前，云层上面住着一个悲伤的巨人。他丢了所有的东西，还丢了假牙。">
+        <div class="cn"><ruby>很<rt>hěn</rt></ruby><ruby>久<rt>jiǔ</rt></ruby><ruby>很<rt>hěn</rt></ruby><ruby>久<rt>jiǔ</rt></ruby><ruby>以<rt>yǐ</rt></ruby><ruby>前<rt>qián</rt></ruby>，<ruby>云<rt>yún</rt></ruby><ruby>层<rt>céng</rt></ruby><ruby>上<rt>shàng</rt></ruby><ruby>面<rt>mian</rt></ruby><ruby>住<rt>zhù</rt></ruby><ruby>着<rt>zhe</rt></ruby><ruby>一<rt>yí</rt></ruby><ruby>个<rt>ge</rt></ruby><ruby>悲<rt>bēi</rt></ruby><ruby>伤<rt>shāng</rt></ruby><ruby>的<rt>de</rt></ruby><ruby>巨<rt>jù</rt></ruby><ruby>人<rt>rén</rt></ruby>。<ruby>他<rt>tā</rt></ruby><ruby>丢<rt>diū</rt></ruby><ruby>了<rt>le</rt></ruby><ruby>所<rt>suǒ</rt></ruby><ruby>有<rt>yǒu</rt></ruby><ruby>的<rt>de</rt></ruby><ruby>东<rt>dōng</rt></ruby><ruby>西<rt>xi</rt></ruby>，<ruby>还<rt>hái</rt></ruby><ruby>丢<rt>diū</rt></ruby><ruby>了<rt>le</rt></ruby><ruby>假<rt>jiǎ</rt></ruby><ruby>牙<rt>yá</rt></ruby>。</div>
+        <div class="en">A long time ago, above the clouds lived a sad giant. He lost everything, and he lost his false teeth.</div>
+        <button class="audio-btn" onclick="toggleAudio(this)">🔊</button>
+      </div>
+    </div>
+
+    <div class="scene">
+      <div class="scene-header">
+        <h4>Scene 2 · Jim Arrives 杰姆来了</h4>
+        <button class="btn play-all" onclick="playScene('jim', 2)">▶ Play Scene</button>
+      </div>
+      <div class="line" data-audio="一天，有人敲门。门外站着一个 juicy 的小男孩。巨人说：请进，你很安全。">
+        <div class="cn"><ruby>一<rt>yì</rt></ruby><ruby>天<rt>tiān</rt></ruby>，<ruby>有<rt>yǒu</rt></ruby><ruby>人<rt>rén</rt></ruby><ruby>敲<rt>qiāo</rt></ruby><ruby>门<rt>mén</rt></ruby>。<ruby>门<rt>mén</rt></ruby><ruby>外<rt>wài</rt></ruby><ruby>站<rt>zhàn</rt></ruby><ruby>着<rt>zhe</rt></ruby><ruby>一<rt>yí</rt></ruby><ruby>个<rt>ge</rt></ruby> juicy <ruby>的<rt>de</rt></ruby><ruby>小<rt>xiǎo</rt></ruby><ruby>男<rt>nán</rt></ruby><ruby>孩<rt>hái</rt></ruby>。<ruby>巨<rt>jù</rt></ruby><ruby>人<rt>rén</rt></ruby><ruby>说<rt>shuō</rt></ruby>：<ruby>请<rt>qǐng</rt></ruby><ruby>进<rt>jìn</rt></ruby>，<ruby>你<rt>nǐ</rt></ruby><ruby>很<rt>hěn</rt></ruby><ruby>安<rt>ān</rt></ruby><ruby>全<rt>quán</rt></ruby>。</div>
+        <div class="en">One day, there was a knock. A juicy boy stood outside. The giant said: Come in, you are safe.</div>
+        <button class="audio-btn" onclick="toggleAudio(this)">🔊</button>
+      </div>
+      <div class="line" data-audio="巨人哭了：我丢了假牙，只能喝汤。你能帮我吗？">
+        <div class="cn"><ruby>巨<rt>jù</rt></ruby><ruby>人<rt>rén</rt></ruby><ruby>哭<rt>kū</rt></ruby><ruby>了<rt>le</rt></ruby>：<ruby>我<rt>wǒ</rt></ruby><ruby>丢<rt>diū</rt></ruby><ruby>了<rt>le</rt></ruby><ruby>假<rt>jiǎ</rt></ruby><ruby>牙<rt>yá</rt></ruby>，<ruby>只<rt>zhǐ</rt></ruby><ruby>能<rt>néng</rt></ruby><ruby>喝<rt>hē</rt></ruby><ruby>汤<rt>tāng</rt></ruby>。<ruby>你<rt>nǐ</rt></ruby><ruby>能<rt>néng</rt></ruby><ruby>帮<rt>bāng</rt></ruby><ruby>我<rt>wǒ</rt></ruby><ruby>吗<rt>ma</rt></ruby>？</div>
+        <div class="en">The giant cried: I lost my false teeth, I can only drink soup. Can you help me?</div>
+        <button class="audio-btn" onclick="toggleAudio(this)">🔊</button>
+      </div>
+    </div>
+
+    <div class="scene">
+      <div class="scene-header">
+        <h4>Scene 3 · The Dentist 牙医</h4>
+        <button class="btn play-all" onclick="playScene('jim', 3)">▶ Play Scene</button>
+      </div>
+      <div class="line" data-audio="杰姆量了巨人的嘴巴，拿着金币跑去找牙医。">
+        <div class="cn"><ruby>杰<rt>Jié</rt></ruby><ruby>姆<rt>mǔ</rt></ruby><ruby>量<rt>liáng</rt></ruby><ruby>了<rt>le</rt></ruby><ruby>巨<rt>jù</rt></ruby><ruby>人<rt>rén</rt></ruby><ruby>的<rt>de</rt></ruby><ruby>嘴<rt>zuǐ</rt></ruby><ruby>巴<rt>ba</rt></ruby>，<ruby>拿<rt>ná</rt></ruby><ruby>着<rt>zhe</rt></ruby><ruby>金<rt>jīn</rt></ruby><ruby>币<rt>bì</rt></ruby><ruby>跑<rt>pǎo</rt></ruby><ruby>去<rt>qù</rt></ruby><ruby>找<rt>zhǎo</rt></ruby><ruby>牙<rt>yá</rt></ruby><ruby>医<rt>yī</rt></ruby>。</div>
+        <div class="en">Jim measured the giant's mouth, took the gold coin, and ran to find the dentist.</div>
+        <button class="audio-btn" onclick="toggleAudio(this)">🔊</button>
+      </div>
+      <div class="line" data-audio="巨人有了新牙齿！他跳上跳下，开心地说：太好了！我饿了！">
+        <div class="cn"><ruby>巨<rt>jù</rt></ruby><ruby>人<rt>rén</rt></ruby><ruby>有<rt>yǒu</rt></ruby><ruby>了<rt>le</rt></ruby><ruby>新<rt>xīn</rt></ruby><ruby>牙<rt>yá</rt></ruby><ruby>齿<rt>chǐ</rt></ruby>！<ruby>他<rt>tā</rt></ruby><ruby>跳<rt>tiào</rt></ruby><ruby>上<rt>shàng</rt></ruby><ruby>跳<rt>tiào</rt></ruby><ruby>下<rt>xià</rt></ruby>，<ruby>开<rt>kāi</rt></ruby><ruby>心<rt>xīn</rt></ruby><ruby>地<rt>de</rt></ruby><ruby>说<rt>shuō</rt></ruby>：<ruby>太<rt>tài</rt></ruby><ruby>好<rt>hǎo</rt></ruby><ruby>了<rt>le</rt></ruby>！<ruby>我<rt>wǒ</rt></ruby><ruby>饿<rt>è</rt></ruby><ruby>了<rt>le</rt></ruby>！</div>
+        <div class="en">The giant had new teeth! He jumped up and down and said happily: Wonderful! I'm hungry!</div>
+        <button class="audio-btn" onclick="toggleAudio(this)">🔊</button>
+      </div>
+      <div class="line" data-audio="巨人看着杰姆说：炸男孩！">
+        <div class="cn"><ruby>巨<rt>jù</rt></ruby><ruby>人<rt>rén</rt></ruby><ruby>看<rt>kàn</rt></ruby><ruby>着<rt>zhe</rt></ruby><ruby>杰<rt>Jié</rt></ruby><ruby>姆<rt>mǔ</rt></ruby><ruby>说<rt>shuō</rt></ruby>：<ruby>炸<rt>zhà</rt></ruby><ruby>男<rt>nán</rt></ruby><ruby>孩<rt>hái</rt></ruby>！</div>
+        <div class="en">The giant looked at Jim and said: Fried boy!</div>
+        <button class="audio-btn" onclick="toggleAudio(this)">🔊</button>
+      </div>
+    </div>
+
+    <div class="scene">
+      <div class="scene-header">
+        <h4>Scene 4 · Escape 逃跑</h4>
+        <button class="btn play-all" onclick="playScene('jim', 4)">▶ Play Scene</button>
+      </div>
+      <div class="line" data-audio="杰姆赶快跑！他滑下仙豆，拿起斧头，砍倒了仙豆。">
+        <div class="cn"><ruby>杰<rt>Jié</rt></ruby><ruby>姆<rt>mǔ</rt></ruby><ruby>赶<rt>gǎn</rt></ruby><ruby>快<rt>kuài</rt></ruby><ruby>跑<rt>pǎo</rt></ruby>！<ruby>他<rt>tā</rt></ruby><ruby>滑<rt>huá</rt></ruby><ruby>下<rt>xià</rt></ruby><ruby>仙<rt>xiān</rt></ruby><ruby>豆<rt>dòu</rt></ruby>，<ruby>拿<rt>ná</rt></ruby><ruby>起<rt>qǐ</rt></ruby><ruby>斧<rt>fǔ</rt></ruby><ruby>头<rt>tóu</rt></ruby>，<ruby>砍<rt>kǎn</rt></ruby><ruby>倒<rt>dǎo</rt></ruby><ruby>了<rt>le</rt></ruby><ruby>仙<rt>xiān</rt></ruby><ruby>豆<rt>dòu</rt></ruby>。</div>
+        <div class="en">Jim ran quickly! He slid down the beanstalk, grabbed an axe, and chopped it down.</div>
+        <button class="audio-btn" onclick="toggleAudio(this)">🔊</button>
+      </div>
+      <div class="line" data-audio="天上掉下来一张大纸，写着谢谢，还有一块大金币。">
+        <div class="cn"><ruby>天<rt>tiān</rt></ruby><ruby>上<rt>shàng</rt></ruby><ruby>掉<rt>diào</rt></ruby><ruby>下<rt>xià</rt></ruby><ruby>来<rt>lai</rt></ruby><ruby>一<rt>yì</rt></ruby><ruby>张<rt>zhāng</rt></ruby><ruby>大<rt>dà</rt></ruby><ruby>纸<rt>zhǐ</rt></ruby>，<ruby>写<rt>xiě</rt></ruby><ruby>着<rt>zhe</rt></ruby><ruby>谢<rt>xiè</rt></ruby><ruby>谢<rt>xie</rt></ruby>，<ruby>还<rt>hái</rt></ruby><ruby>有<rt>yǒu</rt></ruby><ruby>一<rt>yí</rt></ruby><ruby>块<rt>kuài</rt></ruby><ruby>大<rt>dà</rt></ruby><ruby>金<rt>jīn</rt></ruby><ruby>币<rt>bì</rt></ruby>。</div>
+        <div class="en">A huge piece of paper fell from the sky saying thank you, and a giant gold coin.</div>
+        <button class="audio-btn" onclick="toggleAudio(this)">🔊</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 4. LOST AND FOUND ================= -->
+<section class="panel" id="lost">
+  <div class="wrap">
+    <div class="print-header"><strong>Chinese Story Performance Project · Rehearsal Script</strong></div>
+
+    <div class="story-header-container">
+      <img src="https://images.unsplash.com/photo-1551410224-699683e15636?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Lost and Found" class="story-image">
+      <div class="story-head">
+        <div class="story-title-box">
+          <span class="py-title">Míshī yǔ Zhǎodào</span>
+          <h2>迷失与找到</h2>
+          <span class="en-title">Lost and Found</span>
+        </div>
+        <div class="btn-group">
+          <button class="btn" onclick="window.print()">🖨 Print / Save as PDF</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="scene">
+      <div class="scene-header">
+        <h4>Scene 1 · The Penguin 企鹅</h4>
+        <button class="btn play-all" onclick="playScene('lost', 1)">▶ Play Scene</button>
+      </div>
+      <div class="line" data-audio="从前有一个男孩，有一天他在门口发现了一只企鹅。">
+        <div class="cn"><ruby>从<rt>cóng</rt></ruby><ruby>前<rt>qián</rt></ruby><ruby>有<rt>yǒu</rt></ruby><ruby>一<rt>yí</rt></ruby><ruby>个<rt>ge</rt></ruby><ruby>男<rt>nán</rt></ruby><ruby>孩<rt>hái</rt></ruby>，<ruby>有<rt>yǒu</rt></ruby><ruby>一<rt>yì</rt></ruby><ruby>天<rt>tiān</rt></ruby><ruby>他<rt>tā</rt></ruby><ruby>在<rt>zài</rt></ruby><ruby>门<rt>mén</rt></ruby><ruby>口<rt>kǒu</rt></ruby><ruby>发<rt>fā</rt></ruby><ruby>现<rt>xiàn</rt></ruby><ruby>了<rt>le</rt></ruby><ruby>一<rt>yì</rt></ruby><ruby>只<rt>zhī</rt></ruby><ruby>企<rt>qǐ</rt></ruby><ruby>鹅<rt>é</rt></ruby>。</div>
+        <div class="en">Once there was a boy, and one day he found a penguin at his door.</div>
+        <button class="audio-btn" onclick="toggleAudio(this)">🔊</button>
+      </div>
+      <div class="line" data-audio="男孩不知道它从哪里来。他决定帮企鹅找家。">
+        <div class="cn"><ruby>男<rt>nán</rt></ruby><ruby>孩<rt>hái</rt></ruby><ruby>不<rt>bù</rt></ruby><ruby>知<rt>zhī</rt></ruby><ruby>道<rt>dào</rt></ruby><ruby>它<rt>tā</rt></ruby><ruby>从<rt>cóng</rt></ruby><ruby>哪<rt>nǎ</rt></ruby><ruby>里<rt>lǐ</rt></ruby><ruby>来<rt>lái</rt></ruby>。<ruby>他<rt>tā</rt></ruby><ruby>决<rt>jué</rt></ruby><ruby>定<rt>dìng</rt></ruby><ruby>帮<rt>bāng</rt></ruby><ruby>企<rt>qǐ</rt></ruby><ruby>鹅<rt>é</rt></ruby><ruby>找<rt>zhǎo</rt></ruby><ruby>家<rt>jiā</rt></ruby>。</div>
+        <div class="en">The boy didn't know where it came from. He decided to help the penguin find home.</div>
+        <button class="audio-btn" onclick="toggleAudio(this)">🔊</button>
+      </div>
+    </div>
+
+    <div class="scene">
+      <div class="scene-header">
+        <h4>Scene 2 · Asking for Help 寻求帮助</h4>
+        <button class="btn play-all" onclick="playScene('lost', 2)">▶ Play Scene</button>
+      </div>
+      <div class="line" data-audio="他去了失物招领处。但是没有人丢企鹅。">
+        <div class="cn"><ruby>他<rt>tā</rt></ruby><ruby>去<rt>qù</rt></ruby><ruby>了<rt>le</rt></ruby><ruby>失<rt>shī</rt></ruby><ruby>物<rt>wù</rt></ruby><ruby>招<rt>zhāo</rt></ruby><ruby>领<rt>lǐng</rt></ruby><ruby>处<rt>chù</rt></ruby>。<ruby>但<rt>dàn</rt></ruby><ruby>是<rt>shì</rt></ruby><ruby>没<rt>méi</rt></ruby><ruby>有<rt>yǒu</rt></ruby><ruby>人<rt>rén</rt></ruby><ruby>丢<rt>diū</rt></ruby><ruby>企<rt>qǐ</rt></ruby><ruby>鹅<rt>é</rt></ruby>。</div>
+        <div class="en">He went to the Lost and Found Office. But no one was missing a penguin.</div>
+        <button class="audio-btn" onclick="toggleAudio(this)">🔊</button>
+      </div>
+      <div class="line" data-audio="他问小鸟，小鸟不理他。他问鸭子，鸭子漂走了。">
+        <div class="cn"><ruby>他<rt>tā</rt></ruby><ruby>问<rt>wèn</rt></ruby><ruby>小<rt>xiǎo</rt></ruby><ruby>鸟<rt>niǎo</rt></ruby>，<ruby>小<rt>xiǎo</rt></ruby><ruby>鸟<rt>niǎo</rt></ruby><ruby>不<rt>bù</rt></ruby><ruby>理<rt>lǐ</rt></ruby><ruby>他<rt>tā</rt></ruby>。<ruby>他<rt>tā</rt></ruby><ruby>问<rt>wèn</rt></ruby><ruby>鸭<rt>yā</rt></ruby><ruby>子<rt>zi</rt></ruby>，<ruby>鸭<rt>yā</rt></ruby><ruby>子<rt>zi</rt></ruby><ruby>漂<rt>piāo</rt></ruby><ruby>走<rt>zǒu</rt></ruby><ruby>了<rt>le</rt></ruby>。</div>
+        <div class="en">He asked the birds, they ignored him. He asked the duck, the duck floated away.</div>
+        <button class="audio-btn" onclick="toggleAudio(this)">🔊</button>
+      </div>
+      <div class="line" data-audio="男孩睡不着。他很想帮忙，但是他不知道怎么办。">
+        <div class="cn"><ruby>男<rt>nán</rt></ruby><ruby>孩<rt>hái</rt></ruby><ruby>睡<rt>shuì</rt></ruby><ruby>不<rt>bù</rt></ruby><ruby>着<rt>zháo</rt></ruby>。<ruby>他<rt>tā</rt></ruby><ruby>很<rt>hěn</rt></ruby><ruby>想<rt>xiǎng</rt></ruby><ruby>帮<rt>bāng</rt></ruby><ruby>忙<rt>máng</rt></ruby>，<ruby>但<rt>dàn</rt></ruby><ruby>是<rt>shì</rt></ruby><ruby>他<rt>tā</rt></ruby><ruby>不<rt>bù</rt></ruby><ruby>知<rt>zhī</rt></ruby><ruby>道<rt>dào</rt></ruby><ruby>怎<rt>zěn</rt></ruby><ruby>么<rt>me</rt></ruby><ruby>办<rt>bàn</rt></ruby>。</div>
+        <div class="en">The boy couldn't sleep. He wanted to help, but he didn't know how.</div>
+        <button class="audio-btn" onclick="toggleAudio(this)">🔊</button>
+      </div>
+    </div>
+
+    <div class="scene">
+      <div class="scene-header">
+        <h4>Scene 3 · The Journey 旅程</h4>
+        <button class="btn play-all" onclick="playScene('lost', 3)">▶ Play Scene</button>
+      </div>
+      <div class="line" data-audio="第二天，他发现企鹅住在南极。他造了一艘小船。">
+        <div class="cn"><ruby>第<rt>dì</rt></ruby><ruby>二<rt>èr</rt></ruby><ruby>天<rt>tiān</rt></ruby>，<ruby>他<rt>tā</rt></ruby><ruby>发<rt>fā</rt></ruby><ruby>现<rt>xiàn</rt></ruby><ruby>企<rt>qǐ</rt></ruby><ruby>鹅<rt>é</rt></ruby><ruby>住<rt>zhù</rt></ruby><ruby>在<rt>zài</rt></ruby><ruby>南<rt>Nán</rt></ruby><ruby>极<rt>jí</rt></ruby>。<ruby>他<rt>tā</rt></ruby><ruby>造<rt>zào</rt></ruby><ruby>了<rt>le</rt></ruby><ruby>一<rt>yì</rt></ruby><ruby>艘<rt>sōu</rt></ruby><ruby>小<rt>xiǎo</rt></ruby><ruby>船<rt>chuán</rt></ruby>。</div>
+        <div class="en">The next morning, he discovered penguins live at the South Pole. He made a small boat.</div>
+        <button class="audio-btn" onclick="toggleAudio(this)">🔊</button>
+      </div>
+      <div class="line" data-audio="他们划了很多天。遇到大风大浪，男孩一直讲故事给企鹅听。">
+        <div class="cn"><ruby>他<rt>tā</rt></ruby><ruby>们<rt>men</rt></ruby><ruby>划<rt>huá</rt></ruby><ruby>了<rt>le</rt></ruby><ruby>很<rt>hěn</rt></ruby><ruby>多<rt>duō</rt></ruby><ruby>天<rt>tiān</rt></ruby>。<ruby>遇<rt>yù</rt></ruby><ruby>到<rt>dào</rt></ruby><ruby>大<rt>dà</rt></ruby><ruby>风<rt>fēng</rt></ruby><ruby>大<rt>dà</rt></ruby><ruby>浪<rt>làng</rt></ruby>，<ruby>男<rt>nán</rt></ruby><ruby>孩<rt>hái</rt></ruby><ruby>一<rt>yì</rt></ruby><ruby>直<rt>zhí</rt></ruby><ruby>讲<rt>jiǎng</rt></ruby><ruby>故<rt>gù</rt></ruby><ruby>事<rt>shì</rt></ruby><ruby>给<rt>gěi</rt></ruby><ruby>企<rt>qǐ</rt></ruby><ruby>鹅<rt>é</rt></ruby><ruby>听<rt>tīng</rt></ruby>。</div>
+        <div class="en">They rowed for many days. Through big storms, the boy told stories to the penguin.</div>
+        <button class="audio-btn" onclick="toggleAudio(this)">🔊</button>
+      </div>
+    </div>
+
+    <div class="scene">
+      <div class="scene-header">
+        <h4>Scene 4 · The Realisation 真相</h4>
+        <button class="btn play-all" onclick="playScene('lost', 4)">▶ Play Scene</button>
+      </div>
+      <div class="line" data-audio="到了南极，企鹅看起来很伤心。男孩说再见，划船回家。">
+        <div class="cn"><ruby>到<rt>dào</rt></ruby><ruby>了<rt>le</rt></ruby><ruby>南<rt>Nán</rt></ruby><ruby>极<rt>jí</rt></ruby>，<ruby>企<rt>qǐ</rt></ruby><ruby>鹅<rt>é</rt></ruby><ruby>看<rt>kàn</rt></ruby><ruby>起<rt>qǐ</rt></ruby><ruby>来<rt>lai</rt></ruby><ruby>很<rt>hěn</rt></ruby><ruby>伤<rt>shāng</rt></ruby><ruby>心<rt>xīn</rt></ruby>。<ruby>男<rt>nán</rt></ruby><ruby>孩<rt>hái</rt></ruby><ruby>说<rt>shuō</rt></ruby><ruby>再<rt>zài</rt></ruby><ruby>见<rt>jiàn</rt></ruby>，<ruby>划<rt>huá</rt></ruby><ruby>船<rt>chuán</rt></ruby><ruby>回<rt>huí</rt></ruby><ruby>家<rt>jiā</rt></ruby>。</div>
+        <div class="en">At the South Pole, the penguin looked sad. The boy said goodbye and rowed home.</div>
+        <button class="audio-btn" onclick="toggleAudio(this)">🔊</button>
+      </div>
+      <div class="line" data-audio="但是男孩越想越不对。企鹅不是迷路了，它只是太孤单了！">
+        <div class="cn"><ruby>但<rt>dàn</rt></ruby><ruby>是<rt>shì</rt></ruby><ruby>男<rt>nán</rt></ruby><ruby>孩<rt>hái</rt></ruby><ruby>越<rt>yuè</rt></ruby><ruby>想<rt>xiǎng</rt></ruby><ruby>越<rt>yuè</rt></ruby><ruby>不<rt>bú</rt></ruby><ruby>对<rt>duì</rt></ruby>。<ruby>企<rt>qǐ</rt></ruby><ruby>鹅<rt>é</rt></ruby><ruby>不<rt>bú</rt></ruby><ruby>是<rt>shì</rt></ruby><ruby>迷<rt>mí</rt></ruby><ruby>路<rt>lù</rt></ruby><ruby>了<rt>le</rt></ruby>，<ruby>它<rt>tā</rt></ruby><ruby>只<rt>zhǐ</rt></ruby><ruby>是<rt>shì</rt></ruby><ruby>太<rt>tài</rt></ruby><ruby>孤<rt>gū</rt></ruby><ruby>单<rt>dān</rt></ruby><ruby>了<rt>le</rt></ruby>！</div>
+        <div class="en">But the more he thought, the more he realised: The penguin wasn't lost. He was just lonely!</div>
+        <button class="audio-btn" onclick="toggleAudio(this)">🔊</button>
+      </div>
+      <div class="line" data-audio="他赶快划回去。终于找到了企鹅，他们一起开心地回家了。">
+        <div class="cn"><ruby>他<rt>tā</rt></ruby><ruby>赶<rt>gǎn</rt></ruby><ruby>快<rt>kuài</rt></ruby><ruby>划<rt>huá</rt></ruby><ruby>回<rt>huí</rt></ruby><ruby>去<rt>qù</rt></ruby>。<ruby>终<rt>zhōng</rt></ruby><ruby>于<rt>yú</rt></ruby><ruby>找<rt>zhǎo</rt></ruby><ruby>到<rt>dào</rt></ruby><ruby>了<rt>le</rt></ruby><ruby>企<rt>qǐ</rt></ruby><ruby>鹅<rt>é</rt></ruby>，<ruby>他<rt>tā</rt></ruby><ruby>们<rt>men</rt></ruby><ruby>一<rt>yì</rt></ruby><ruby>起<rt>qǐ</rt></ruby><ruby>开<rt>kāi</rt></ruby><ruby>心<rt>xīn</rt></ruby><ruby>地<rt>de</rt></ruby><ruby>回<rt>huí</rt></ruby><ruby>家<rt>jiā</rt></ruby><ruby>了<rt>le</rt></ruby>。</div>
+        <div class="en">He quickly rowed back. He found the penguin, and they went home together happily.</div>
+        <button class="audio-btn" onclick="toggleAudio(this)">🔊</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 5. THE JOURNEY HOME ================= -->
+<section class="panel" id="journey">
+  <div class="wrap">
+    <div class="print-header"><strong>Chinese Story Performance Project · Rehearsal Script</strong></div>
+
+    <div class="story-header-container">
+      <img src="https://images.unsplash.com/photo-1543946207-39bd91e70ca7?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="The Journey Home" class="story-image">
+      <div class="story-head">
+        <div class="story-title-box">
+          <span class="py-title">Huíjiā zhī Lǚ</span>
+          <h2>回家之旅</h2>
+          <span class="en-title">The Journey Home</span>
+        </div>
+        <div class="btn-group">
+          <button class="btn" onclick="window.print()">🖨 Print / Save as PDF</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="scene">
+      <div class="scene-header">
+        <h4>Scene 1 · The Melting Ice 融化的冰</h4>
+        <button class="btn play-all" onclick="playScene('journey', 1)">▶ Play Scene</button>
+      </div>
+      <div class="line" data-audio="北极熊住在冰上。可是冰融化了，食物也没有了。">
+        <div class="cn"><ruby>北<rt>běi</rt></ruby><ruby>极<rt>jí</rt></ruby><ruby>熊<rt>xióng</rt></ruby><ruby>住<rt>zhù</rt></ruby><ruby>在<rt>zài</rt></ruby><ruby>冰<rt>bīng</rt></ruby><ruby>上<rt>shàng</rt></ruby>。<ruby>可<rt>kě</rt></ruby><ruby>是<rt>shì</rt></ruby><ruby>冰<rt>bīng</rt></ruby><ruby>融<rt>róng</rt></ruby><ruby>化<rt>huà</rt></ruby><ruby>了<rt>le</rt></ruby>，<ruby>食<rt>shí</rt></ruby><ruby>物<rt>wù</rt></ruby><ruby>也<rt>yě</rt></ruby><ruby>没<rt>méi</rt></ruby><ruby>有<rt>yǒu</rt></ruby><ruby>了<rt>le</rt></ruby>。</div>
+        <div class="en">Polar Bear lived on the ice. But the ice was melting, and there was no food.</div>
+        <button class="audio-btn" onclick="toggleAudio(this)">🔊</button>
+      </div>
+      <div class="line" data-audio="他说：我不能留在这里了。他看到一艘小船，爬了上去。">
+        <div class="cn"><ruby>他<rt>tā</rt></ruby><ruby>说<rt>shuō</rt></ruby>：<ruby>我<rt>wǒ</rt></ruby><ruby>不<rt>bù</rt></ruby><ruby>能<rt>néng</rt></ruby><ruby>留<rt>liú</rt></ruby><ruby>在<rt>zài</rt></ruby><ruby>这<rt>zhè</rt></ruby><ruby>里<rt>lǐ</rt></ruby><ruby>了<rt>le</rt></ruby>。<ruby>他<rt>tā</rt></ruby><ruby>看<rt>kàn</rt></ruby><ruby>到<rt>dào</rt></ruby><ruby>一<rt>yì</rt></ruby><ruby>艘<rt>sōu</rt></ruby><ruby>小<rt>xiǎo</rt></ruby><ruby>船<rt>chuán</rt></ruby>，<ruby>爬<rt>pá</rt></ruby><ruby>了<rt>le</rt></ruby><ruby>上<rt>shàng</rt></ruby><ruby>去<rt>qù</rt></ruby>。</div>
+        <div class="en">He said: I can't stay here. He found a little boat and climbed in.</div>
+        <button class="audio-btn" onclick="toggleAudio(this)">🔊</button>
+      </div>
+    </div>
+
+    <div class="scene">
+      <div class="scene-header">
+        <h4>Scene 2 · The Panda 熊猫</h4>
+        <button class="btn play-all" onclick="playScene('journey', 2)">▶ Play Scene</button>
+      </div>
+      <div class="line" data-audio="他划到了城市。一只熊猫问：你在干什么？">
+        <div class="cn"><ruby>他<rt>tā</rt></ruby><ruby>划<rt>huá</rt></ruby><ruby>到<rt>dào</rt></ruby><ruby>了<rt>le</rt></ruby><ruby>城<rt>chéng</rt></ruby><ruby>市<rt>shì</rt></ruby>。<ruby>一<rt>yì</rt></ruby><ruby>只<rt>zhī</rt></ruby><ruby>熊<rt>xióng</rt></ruby><ruby>猫<rt>māo</rt></ruby><ruby>问<rt>wèn</rt></ruby>：<ruby>你<rt>nǐ</rt></ruby><ruby>在<rt>zài</rt></ruby><ruby>干<rt>gàn</rt></ruby><ruby>什<rt>shén</rt></ruby><ruby>么<rt>me</rt></ruby>？</div>
+        <div class="en">He sailed to a city. A panda asked: What are you doing?</div>
+        <button class="audio-btn" onclick="toggleAudio(this)">🔊</button>
+      </div>
+      <div class="line" data-audio="北极熊说：我在找新家。熊猫说：我也不能留在这里，我跟你一起走！">
+        <div class="cn"><ruby>北<rt>běi</rt></ruby><ruby>极<rt>jí</rt></ruby><ruby>熊<rt>xióng</rt></ruby><ruby>说<rt>shuō</rt></ruby>：<ruby>我<rt>wǒ</rt></ruby><ruby>在<rt>zài</rt></ruby><ruby>找<rt>zhǎo</rt></ruby><ruby>新<rt>xīn</rt></ruby><ruby>家<rt>jiā</rt></ruby>。<ruby>熊<rt>xióng</rt></ruby><ruby>猫<rt>māo</rt></ruby><ruby>说<rt>shuō</rt></ruby>：<ruby>我<rt>wǒ</rt></ruby><ruby>也<rt>yě</rt></ruby><ruby>不<rt>bù</rt></ruby><ruby>能<rt>néng</rt></ruby><ruby>留<rt>liú</rt></ruby><ruby>在<rt>zài</rt></ruby><ruby>这<rt>zhè</rt></ruby><ruby>里<rt>lǐ</rt></ruby>，<ruby>我<rt>wǒ</rt></ruby><ruby>跟<rt>gēn</rt></ruby><ruby>你<rt>nǐ</rt></ruby><ruby>一<rt>yì</rt></ruby><ruby>起<rt>qǐ</rt></ruby><ruby>走<rt>zǒu</rt></ruby>！</div>
+        <div class="en">Polar Bear said: I'm looking for a new home. Panda said: I can't stay here either, I'll come with you!</div>
+        <button class="audio-btn" onclick="toggleAudio(this)">🔊</button>
+      </div>
+    </div>
+
+    <div class="scene">
+      <div class="scene-header">
+        <h4>Scene 3 · The Orang-utan & Elephant 猩猩和大象</h4>
+        <button class="btn play-all" onclick="playScene('journey', 3)">▶ Play Scene</button>
+      </div>
+      <div class="line" data-audio="他们遇到了红毛猩猩。她说：树都没有了，我没地方爬了。">
+        <div class="cn"><ruby>他<rt>tā</rt></ruby><ruby>们<rt>men</rt></ruby><ruby>遇<rt>yù</rt></ruby><ruby>到<rt>dào</rt></ruby><ruby>了<rt>le</rt></ruby><ruby>红<rt>hóng</rt></ruby><ruby>毛<rt>máo</rt></ruby><ruby>猩<rt>xīng</rt></ruby><ruby>猩<rt>xing</rt></ruby>。<ruby>她<rt>tā</rt></ruby><ruby>说<rt>shuō</rt></ruby>：<ruby>树<rt>shù</rt></ruby><ruby>都<rt>dōu</rt></ruby><ruby>没<rt>méi</rt></ruby><ruby>有<rt>yǒu</rt></ruby><ruby>了<rt>le</rt></ruby>，<ruby>我<rt>wǒ</rt></ruby><ruby>没<rt>méi</rt></ruby><ruby>地<rt>dì</rt></ruby><ruby>方<rt>fāng</rt></ruby><ruby>爬<rt>pá</rt></ruby><ruby>了<rt>le</rt></ruby>。</div>
+        <div class="en">They met an orang-utan. She said: The trees are gone, I have nothing to climb.</div>
+        <button class="audio-btn" onclick="toggleAudio(this)">🔊</button>
+      </div>
+      <div class="line" data-audio="他们遇到一头大象。大象说：有人在偷我的象牙，我很害怕。">
+        <div class="cn"><ruby>他<rt>tā</rt></ruby><ruby>们<rt>men</rt></ruby><ruby>遇<rt>yù</rt></ruby><ruby>到<rt>dào</rt></ruby><ruby>一<rt>yì</rt></ruby><ruby>头<rt>tóu</rt></ruby><ruby>大<rt>dà</rt></ruby><ruby>象<rt>xiàng</rt></ruby>。<ruby>大<rt>dà</rt></ruby><ruby>象<rt>xiàng</rt></ruby><ruby>说<rt>shuō</rt></ruby>：<ruby>有<rt>yǒu</rt></ruby><ruby>人<rt>rén</rt></ruby><ruby>在<rt>zài</rt></ruby><ruby>偷<rt>tōu</rt></ruby><ruby>我<rt>wǒ</rt></ruby><ruby>的<rt>de</rt></ruby><ruby>象<rt>xiàng</rt></ruby><ruby>牙<rt>yá</rt></ruby>，<ruby>我<rt>wǒ</rt></ruby><ruby>很<rt>hěn</rt></ruby><ruby>害<rt>hài</rt></ruby><ruby>怕<rt>pà</rt></ruby>。</div>
+        <div class="en">They met an elephant. The elephant said: Someone is trying to steal my tusks, I am scared.</div>
+        <button class="audio-btn" onclick="toggleAudio(this)">🔊</button>
+      </div>
+      <div class="line" data-audio="大家说：跟我们走吧！大象爬上了船。">
+        <div class="cn"><ruby>大<rt>dà</rt></ruby><ruby>家<rt>jiā</rt></ruby><ruby>说<rt>shuō</rt></ruby>：<ruby>跟<rt>gēn</rt></ruby><ruby>我<rt>wǒ</rt></ruby><ruby>们<rt>men</rt></ruby><ruby>走<rt>zǒu</rt></ruby><ruby>吧<rt>ba</rt></ruby>！<ruby>大<rt>dà</rt></ruby><ruby>象<rt>xiàng</rt></ruby><ruby>爬<rt>pá</rt></ruby><ruby>上<rt>shàng</rt></ruby><ruby>了<rt>le</rt></ruby><ruby>船<rt>chuán</rt></ruby>。</div>
+        <div class="en">Everyone said: Come with us! The elephant climbed into the boat.</div>
+        <button class="audio-btn" onclick="toggleAudio(this)">🔊</button>
+      </div>
+    </div>
+
+    <div class="scene">
+      <div class="scene-header">
+        <h4>Scene 4 · The Dodo 渡渡鸟</h4>
+        <button class="btn play-all" onclick="playScene('journey', 4)">▶ Play Scene</button>
+      </div>
+      <div class="line" data-audio="暴风雨过后，他们迷路了。他们看到了一只渡渡鸟。">
+        <div class="cn"><ruby>暴<rt>bào</rt></ruby><ruby>风<rt>fēng</rt></ruby><ruby>雨<rt>yǔ</rt></ruby><ruby>过<rt>guò</rt></ruby><ruby>后<rt>hòu</rt></ruby>，<ruby>他<rt>tā</rt></ruby><ruby>们<rt>men</rt></ruby><ruby>迷<rt>mí</rt></ruby><ruby>路<rt>lù</rt></ruby><ruby>了<rt>le</rt></ruby>。<ruby>他<rt>tā</rt></ruby><ruby>们<rt>men</rt></ruby><ruby>看<rt>kàn</rt></ruby><ruby>到<rt>dào</rt></ruby><ruby>了<rt>le</rt></ruby><ruby>一<rt>yì</rt></ruby><ruby>只<rt>zhī</rt></ruby><ruby>渡<rt>dù</rt></ruby><ruby>渡<rt>dù</rt></ruby><ruby>鸟<rt>niǎo</rt></ruby>。</div>
+        <div class="en">After a storm, they were lost. They saw a Dodo bird.</div>
+        <button class="audio-btn" onclick="toggleAudio(this)">🔊</button>
+      </div>
+      <div class="line" data-audio="渡渡鸟说：等树长回来，冰回来，城市不再变大，你们就可以回家了。">
+        <div class="cn"><ruby>渡<rt>dù</rt></ruby><ruby>渡<rt>dù</rt></ruby><ruby>鸟<rt>niǎo</rt></ruby><ruby>说<rt>shuō</rt></ruby>：<ruby>等<rt>děng</rt></ruby><ruby>树<rt>shù</rt></ruby><ruby>长<rt>zhǎng</rt></ruby><ruby>回<rt>huí</rt></ruby><ruby>来<rt>lái</rt></ruby>，<ruby>冰<rt>bīng</rt></ruby><ruby>回<rt>huí</rt></ruby><ruby>来<rt>lái</rt></ruby>，<ruby>城<rt>chéng</rt></ruby><ruby>市<rt>shì</rt></ruby><ruby>不<rt>bú</rt></ruby><ruby>再<rt>zài</rt></ruby><ruby>变<rt>biàn</rt></ruby><ruby>大<rt>dà</rt></ruby>，<ruby>你<rt>nǐ</rt></ruby><ruby>们<rt>men</rt></ruby><ruby>就<rt>jiù</rt></ruby><ruby>可<rt>kě</rt></ruby><ruby>以<rt>yǐ</rt></ruby><ruby>回<rt>huí</rt></ruby><ruby>家<rt>jiā</rt></ruby><ruby>了<rt>le</rt></ruby>。</div>
+        <div class="en">The Dodo said: When the trees grow back, the ice returns, and cities stop getting bigger, you can go home.</div>
+        <button class="audio-btn" onclick="toggleAudio(this)">🔊</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 6. FLOWER BLOCK ================= -->
+<section class="panel" id="flower">
+  <div class="wrap">
+    <div class="print-header"><strong>Chinese Story Performance Project · Rehearsal Script</strong></div>
+
+    <div class="story-header-container">
+      <img src="https://images.unsplash.com/photo-1597848212624-a19eb35e2651?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Flower Block" class="story-image">
+      <div class="story-head">
+        <div class="story-title-box">
+          <span class="py-title">Kāihuā Dàlóu</span>
+          <h2>开花大楼</h2>
+          <span class="en-title">Flower Block</span>
+        </div>
+        <div class="btn-group">
+          <button class="btn" onclick="window.print()">🖨 Print / Save as PDF</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="scene">
+      <div class="scene-header">
+        <h4>Scene 1 · The Seeds 种子</h4>
+        <button class="btn play-all" onclick="playScene('flower', 1)">▶ Play Scene</button>
+      </div>
+      <div class="line" data-audio="杰里迈亚和妈妈种下了向日葵种子。妈妈，接下来呢？">
+        <div class="cn"><ruby>杰<rt>Jié</rt></ruby><ruby>里<rt>lǐ</rt></ruby><ruby>迈<rt>mài</rt></ruby><ruby>亚<rt>yà</rt></ruby><ruby>和<rt>hé</rt></ruby><ruby>妈<rt>mā</rt></ruby><ruby>妈<rt>ma</rt></ruby><ruby>种<rt>zhòng</rt></ruby><ruby>下<rt>xià</rt></ruby><ruby>了<rt>le</rt></ruby><ruby>向<rt>xiàng</rt></ruby><ruby>日<rt>rì</rt></ruby><ruby>葵<rt>kuí</rt></ruby><ruby>种<rt>zhǒng</rt></ruby><ruby>子<rt>zi</rt></ruby>。<ruby>妈<rt>mā</rt></ruby><ruby>妈<rt>ma</rt></ruby>，<ruby>接<rt>jiē</rt></ruby><ruby>下<rt>xià</rt></ruby><ruby>来<rt>lái</rt></ruby><ruby>呢<rt>ne</rt></ruby>？</div>
+        <div class="en">Jeremiah and his mum planted sunflower seeds. Mum, now what?</div>
+        <button class="audio-btn" onclick="toggleAudio(this)">🔊</button>
+      </div>
+      <div class="line" data-audio="妈妈说：等待奇迹发生。那天晚上，杰里迈亚许了一个愿。">
+        <div class="cn"><ruby>妈<rt>mā</rt></ruby><ruby>妈<rt>ma</rt></ruby><ruby>说<rt>shuō</rt></ruby>：<ruby>等<rt>děng</rt></ruby><ruby>待<rt>dài</rt></ruby><ruby>奇<rt>qí</rt></ruby><ruby>迹<rt>jì</rt></ruby><ruby>发<rt>fā</rt></ruby><ruby>生<rt>shēng</rt></ruby>。<ruby>那<rt>nà</rt></ruby><ruby>天<rt>tiān</rt></ruby><ruby>晚<rt>wǎn</rt></ruby><ruby>上<rt>shang</rt></ruby>，<ruby>杰<rt>Jié</rt></ruby><ruby>里<rt>lǐ</rt></ruby><ruby>迈<rt>mài</rt></ruby><ruby>亚<rt>yà</rt></ruby><ruby>许<rt>xǔ</rt></ruby><ruby>了<rt>le</rt></ruby><ruby>一<rt>yí</rt></ruby><ruby>个<rt>ge</rt></ruby><ruby>愿<rt>yuàn</rt></ruby>。</div>
+        <div class="en">Mum said: Wait for the magic to happen. That night, Jeremiah made a wish.</div>
+        <button class="audio-btn" onclick="toggleAudio(this)">🔊</button>
+      </div>
+    </div>
+
+    <div class="scene">
+      <div class="scene-header">
+        <h4>Scene 2 · The Magic 奇迹</h4>
+        <button class="btn play-all" onclick="playScene('flower', 2)">▶ Play Scene</button>
+      </div>
+      <div class="line" data-audio="第二天早上，哥哥大喊：杰里迈亚，快醒醒！出大事了！">
+        <div class="cn"><ruby>第<rt>dì</rt></ruby><ruby>二<rt>èr</rt></ruby><ruby>天<rt>tiān</rt></ruby><ruby>早<rt>zǎo</rt></ruby><ruby>上<rt>shang</rt></ruby>，<ruby>哥<rt>gē</rt></ruby><ruby>哥<rt>ge</rt></ruby><ruby>大<rt>dà</rt></ruby><ruby>喊<rt>hǎn</rt></ruby>：<ruby>杰<rt>Jié</rt></ruby><ruby>里<rt>lǐ</rt></ruby><ruby>迈<rt>mài</rt></ruby><ruby>亚<rt>yà</rt></ruby>，<ruby>快<rt>kuài</rt></ruby><ruby>醒<rt>xǐng</rt></ruby><ruby>醒<rt>xǐng</rt></ruby>！<ruby>出<rt>chū</rt></ruby><ruby>大<rt>dà</rt></ruby><ruby>事<rt>shì</rt></ruby><ruby>了<rt>le</rt></ruby>！</div>
+        <div class="en">The next morning, his brother shouted: Jeremiah, wake up! Something huge happened!</div>
+        <button class="audio-btn" onclick="toggleAudio(this)">🔊</button>
+      </div>
+      <div class="line" data-audio="藤蔓和叶子穿破了天花板！哥哥问：我们该怎么办？！">
+        <div class="cn"><ruby>藤<rt>téng</rt></ruby><ruby>蔓<rt>wàn</rt></ruby><ruby>和<rt>hé</rt></ruby><ruby>叶<rt>yè</rt></ruby><ruby>子<rt>zi</rt></ruby><ruby>穿<rt>chuān</rt></ruby><ruby>破<rt>pò</rt></ruby><ruby>了<rt>le</rt></ruby><ruby>天<rt>tiān</rt></ruby><ruby>花<rt>huā</rt></ruby><ruby>板<rt>bǎn</rt></ruby>！<ruby>哥<rt>gē</rt></ruby><ruby>哥<rt>ge</rt></ruby><ruby>问<rt>wèn</rt></ruby>：<ruby>我<rt>wǒ</rt></ruby><ruby>们<rt>men</rt></ruby><ruby>该<rt>gāi</rt></ruby><ruby>怎<rt>zěn</rt></ruby><ruby>么<rt>me</rt></ruby><ruby>办<rt>bàn</rt></ruby>？！</div>
+        <div class="en">Vines and leaves burst through the ceiling! His brother asked: What are we going to do?!</div>
+        <button class="audio-btn" onclick="toggleAudio(this)">🔊</button>
+      </div>
+      <div class="line" data-audio="杰里迈亚看到了爸爸的照片。爸爸笑着说：跟我来！">
+        <div class="cn"><ruby>杰<rt>Jié</rt></ruby><ruby>里<rt>lǐ</rt></ruby><ruby>迈<rt>mài</rt></ruby><ruby>亚<rt>yà</rt></ruby><ruby>看<rt>kàn</rt></ruby><ruby>到<rt>dào</rt></ruby><ruby>了<rt>le</rt></ruby><ruby>爸<rt>bà</rt></ruby><ruby>爸<rt>ba</rt></ruby><ruby>的<rt>de</rt></ruby><ruby>照<rt>zhào</rt></ruby><ruby>片<rt>piàn</rt></ruby>。<ruby>爸<rt>bà</rt></ruby><ruby>爸<rt>ba</rt></ruby><ruby>笑<rt>xiào</rt></ruby><ruby>着<rt>zhe</rt></ruby><ruby>说<rt>shuō</rt></ruby>：<ruby>跟<rt>gēn</rt></ruby><ruby>我<rt>wǒ</rt></ruby><ruby>来<rt>lái</rt></ruby>！</div>
+        <div class="en">Jeremiah saw his dad's photo. Dad smiled and said: Follow me!</div>
+        <button class="audio-btn" onclick="toggleAudio(this)">🔊</button>
+      </div>
+    </div>
+
+    <div class="scene">
+      <div class="scene-header">
+        <h4>Scene 3 · The Neighbours 邻居们</h4>
+        <button class="btn play-all" onclick="playScene('flower', 3)">▶ Play Scene</button>
+      </div>
+      <div class="line" data-audio="他们跑上楼梯。每一层楼都有新的花和新的邻居。">
+        <div class="cn"><ruby>他<rt>tā</rt></ruby><ruby>们<rt>men</rt></ruby><ruby>跑<rt>pǎo</rt></ruby><ruby>上<rt>shàng</rt></ruby><ruby>楼<rt>lóu</rt></ruby><ruby>梯<rt>tī</rt></ruby>。<ruby>每<rt>měi</rt></ruby><ruby>一<rt>yì</rt></ruby><ruby>层<rt>céng</rt></ruby><ruby>楼<rt>lóu</rt></ruby><ruby>都<rt>dōu</rt></ruby><ruby>有<rt>yǒu</rt></ruby><ruby>新<rt>xīn</rt></ruby><ruby>的<rt>de</rt></ruby><ruby>花<rt>huā</rt></ruby><ruby>和<rt>hé</rt></ruby><ruby>新<rt>xīn</rt></ruby><ruby>的<rt>de</rt></ruby><ruby>邻<rt>lín</rt></ruby><ruby>居<rt>jū</rt></ruby>。</div>
+        <div class="en">They ran up the stairs. On every floor, there were new flowers and new neighbours.</div>
+        <button class="audio-btn" onclick="toggleAudio(this)">🔊</button>
+      </div>
+      <div class="line" data-audio="大家都很开心，一起帮忙找植物的顶端。">
+        <div class="cn"><ruby>大<rt>dà</rt></ruby><ruby>家<rt>jiā</rt></ruby><ruby>都<rt>dōu</rt></ruby><ruby>很<rt>hěn</rt></ruby><ruby>开<rt>kāi</rt></ruby><ruby>心<rt>xīn</rt></ruby>，<ruby>一<rt>yì</rt></ruby><ruby>起<rt>qǐ</rt></ruby><ruby>帮<rt>bāng</rt></ruby><ruby>忙<rt>máng</rt></ruby><ruby>找<rt>zhǎo</rt></ruby><ruby>植<rt>zhí</rt></ruby><ruby>物<rt>wù</rt></ruby><ruby>的<rt>de</rt></ruby><ruby>顶<rt>dǐng</rt></ruby><ruby>端<rt>duān</rt></ruby>。</div>
+        <div class="en">Everyone was happy, helping together to find the top of the plant.</div>
+        <button class="audio-btn" onclick="toggleAudio(this)">🔊</button>
+      </div>
+      <div class="line" data-audio="杰里迈亚有点害怕。哥哥拍拍他的肩膀说：别怕，有我在，爸爸也在。">
+        <div class="cn"><ruby>杰<rt>Jié</rt></ruby><ruby>里<rt>lǐ</rt></ruby><ruby>迈<rt>mài</rt></ruby><ruby>亚<rt>yà</rt></ruby><ruby>有<rt>yǒu</rt></ruby><ruby>点<rt>diǎn</rt></ruby><ruby>害<rt>hài</rt></ruby><ruby>怕<rt>pà</rt></ruby>。<ruby>哥<rt>gē</rt></ruby><ruby>哥<rt>ge</rt></ruby><ruby>拍<rt>pāi</rt></ruby><ruby>拍<rt>pāi</rt></ruby><ruby>他<rt>tā</rt></ruby><ruby>的<rt>de</rt></ruby><ruby>肩<rt>jiān</rt></ruby><ruby>膀<rt>bǎng</rt></ruby><ruby>说<rt>shuō</rt></ruby>：<ruby>别<rt>bié</rt></ruby><ruby>怕<rt>pà</rt></ruby>，<ruby>有<rt>yǒu</rt></ruby><ruby>我<rt>wǒ</rt></ruby><ruby>在<rt>zài</rt></ruby>，<ruby>爸<rt>bà</rt></ruby><ruby>爸<rt>ba</rt></ruby><ruby>也<rt>yě</rt></ruby><ruby>在<rt>zài</rt></ruby>。</div>
+        <div class="en">Jeremiah was a bit scared. His brother patted his shoulder and said: Don't worry, I've got you, and so has Dad.</div>
+        <button class="audio-btn" onclick="toggleAudio(this)">🔊</button>
+      </div>
+    </div>
+
+    <div class="scene">
+      <div class="scene-header">
+        <h4>Scene 4 · The Key 钥匙</h4>
+        <button class="btn play-all" onclick="playScene('flower', 4)">▶ Play Scene</button>
+      </div>
+      <div class="line" data-audio="到了顶楼，门锁了！邻居说：62号的克里普先生有钥匙。">
+        <div class="cn"><ruby>到<rt>dào</rt></ruby><ruby>了<rt>le</rt></ruby><ruby>顶<rt>dǐng</rt></ruby><ruby>楼<rt>lóu</rt></ruby>，<ruby>门<rt>mén</rt></ruby><ruby>锁<rt>suǒ</rt></ruby><ruby>了<rt>le</rt></ruby>！<ruby>邻<rt>lín</rt></ruby><ruby>居<rt>jū</rt></ruby><ruby>说<rt>shuō</rt></ruby>：62 <ruby>号<rt>hào</rt></ruby><ruby>的<rt>de</rt></ruby><ruby>克<rt>Kè</rt></ruby><ruby>里<rt>lǐ</rt></ruby><ruby>普<rt>pǔ</rt></ruby><ruby>先<rt>xiān</rt></ruby><ruby>生<rt>sheng</rt></ruby><ruby>有<rt>yǒu</rt></ruby><ruby>钥<rt>yào</rt></ruby><ruby>匙<rt>shi</rt></ruby>。</div>
+        <div class="en">At the top floor, the door was locked! A neighbour said: Mr Crisp in Flat 62 has the key.</div>
+        <button class="audio-btn" onclick="toggleAudio(this)">🔊</button>
+      </div>
+      <div class="line" data-audio="杰里迈亚很害怕克里普先生。但他还是去敲门了。">
+        <div class="cn"><ruby>杰<rt>Jié</rt></ruby><ruby>里<rt>lǐ</rt></ruby><ruby>迈<rt>mài</rt></ruby><ruby>亚<rt>yà</rt></ruby><ruby>很<rt>hěn</rt></ruby><ruby>害<rt>hài</rt></ruby><ruby>怕<rt>pà</rt></ruby><ruby>克<rt>Kè</rt></ruby><ruby>里<rt>lǐ</rt></ruby><ruby>普<rt>pǔ</rt></ruby><ruby>先<rt>xiān</rt></ruby><ruby>生<rt>sheng</rt></ruby>。<ruby>但<rt>dàn</rt></ruby><ruby>他<rt>tā</rt></ruby><ruby>还<rt>hái</rt></ruby><ruby>是<rt>shì</rt></ruby><ruby>去<rt>qù</rt></ruby><ruby>敲<rt>qiāo</rt></ruby><ruby>门<rt>mén</rt></ruby><ruby>了<rt>le</rt></ruby>。</div>
+        <div class="en">Jeremiah was scared of Mr Crisp. But he went and knocked on the door anyway.</div>
+        <button class="audio-btn" onclick="toggleAudio(this)">🔊</button>
+      </div>
+      <div class="line" data-audio="克里普先生开门了。他没有生气，反而笑了！他说：这些叶子让我想起了小时候爬树！">
+        <div class="cn"><ruby>克<rt>Kè</rt></ruby><ruby>里<rt>lǐ</rt></ruby><ruby>普<rt>pǔ</rt></ruby><ruby>先<rt>xiān</rt></ruby><ruby>生<rt>sheng</rt></ruby><ruby>开<rt>kāi</rt></ruby><ruby>门<rt>mén</rt></ruby><ruby>了<rt>le</rt></ruby>。<ruby>他<rt>tā</rt></ruby><ruby>没<rt>méi</rt></ruby><ruby>有<rt>yǒu</rt></ruby><ruby>生<rt>shēng</rt></ruby><ruby>气<rt>qì</rt></ruby>，<ruby>反<rt>fǎn</rt></ruby><ruby>而<rt>ér</rt></ruby><ruby>笑<rt>xiào</rt></ruby><ruby>了<rt>le</rt></ruby>！<ruby>他<rt>tā</rt></ruby><ruby>说<rt>shuō</rt></ruby>：<ruby>这<rt>zhè</rt></ruby><ruby>些<rt>xiē</rt></ruby><ruby>叶<rt>yè</rt></ruby><ruby>子<rt>zi</rt></ruby><ruby>让<rt>ràng</rt></ruby><ruby>我<rt>wǒ</rt></ruby><ruby>想<rt>xiǎng</rt></ruby><ruby>起<rt>qǐ</rt></ruby><ruby>了<rt>le</rt></ruby><ruby>小<rt>xiǎo</rt></ruby><ruby>时<rt>shí</rt></ruby><ruby>候<rt>hou</rt></ruby><ruby>爬<rt>pá</rt></ruby><ruby>树<rt>shù</rt></ruby>！</div>
+        <div class="en">Mr Crisp opened the door. He wasn't angry, he laughed! He said: These leaves remind me of climbing trees when I was a boy!</div>
+        <button class="audio-btn" onclick="toggleAudio(this)">🔊</button>
+      </div>
+    </div>
+
+    <div class="scene">
+      <div class="scene-header">
+        <h4>Scene 5 · The Roof Garden 屋顶花园</h4>
+        <button class="btn play-all" onclick="playScene('flower', 5)">▶ Play Scene</button>
+      </div>
+      <div class="line" data-audio="门开了。哇！屋顶变成了天堂！到处都是花，中间是杰里迈亚的向日葵。">
+        <div class="cn"><ruby>门<rt>mén</rt></ruby><ruby>开<rt>kāi</rt></ruby><ruby>了<rt>le</rt></ruby>。<ruby>哇<rt>wa</rt></ruby>！<ruby>屋<rt>wū</rt></ruby><ruby>顶<rt>dǐng</rt></ruby><ruby>变<rt>biàn</rt></ruby><ruby>成<rt>chéng</rt></ruby><ruby>了<rt>le</rt></ruby><ruby>天<rt>tiān</rt></ruby><ruby>堂<rt>táng</rt></ruby>！<ruby>到<rt>dào</rt></ruby><ruby>处<rt>chù</rt></ruby><ruby>都<rt>dōu</rt></ruby><ruby>是<rt>shì</rt></ruby><ruby>花<rt>huā</rt></ruby>，<ruby>中<rt>zhōng</rt></ruby><ruby>间<rt>jiān</rt></ruby><ruby>是<rt>shì</rt></ruby><ruby>杰<rt>Jié</rt></ruby><ruby>里<rt>lǐ</rt></ruby><ruby>迈<rt>mài</rt></ruby><ruby>亚<rt>yà</rt></ruby><ruby>的<rt>de</rt></ruby><ruby>向<rt>xiàng</rt></ruby><ruby>日<rt>rì</rt></ruby><ruby>葵<rt>kuí</rt></ruby>。</div>
+        <div class="en">The door opened. Wow! The roof had become a paradise! Flowers everywhere, and in the middle was Jeremiah's sunflower.</div>
+        <button class="audio-btn" onclick="toggleAudio(this)">🔊</button>
+      </div>
+      <div class="line" data-audio="杰里迈亚对大家说：我的植物让我们开心。我们要在这里种更多的花，为了爸爸，也为了我们想念的人。">
+        <div class="cn"><ruby>杰<rt>Jié</rt></ruby><ruby>里<rt>lǐ</rt></ruby><ruby>迈<rt>mài</rt></ruby><ruby>亚<rt>yà</rt></ruby><ruby>对<rt>duì</rt></ruby><ruby>大<rt>dà</rt></ruby><ruby>家<rt>jiā</rt></ruby><ruby>说<rt>shuō</rt></ruby>：<ruby>我<rt>wǒ</rt></ruby><ruby>的<rt>de</rt></ruby><ruby>植<rt>zhí</rt></ruby><ruby>物<rt>wù</rt></ruby><ruby>让<rt>ràng</rt></ruby><ruby>我<rt>wǒ</rt></ruby><ruby>们<rt>men</rt></ruby><ruby>开<rt>kāi</rt></ruby><ruby>心<rt>xīn</rt></ruby>。<ruby>我<rt>wǒ</rt></ruby><ruby>们<rt>men</rt></ruby><ruby>要<rt>yào</rt></ruby><ruby>在<rt>zài</rt></ruby><ruby>这<rt>zhè</rt></ruby><ruby>里<rt>lǐ</rt></ruby><ruby>种<rt>zhòng</rt></ruby><ruby>更<rt>gèng</rt></ruby><ruby>多<rt>duō</rt></ruby><ruby>的<rt>de</rt></ruby><ruby>花<rt>huā</rt></ruby>，<ruby>为<rt>wèi</rt></ruby><ruby>了<rt>le</rt></ruby><ruby>爸<rt>bà</rt></ruby><ruby>爸<rt>ba</rt></ruby>，<ruby>也<rt>yě</rt></ruby><ruby>为<rt>wèi</rt></ruby><ruby>了<rt>le</rt></ruby><ruby>我<rt>wǒ</rt></ruby><ruby>们<rt>men</rt></ruby><ruby>想<rt>xiǎng</rt></ruby><ruby>念<rt>niàn</rt></ruby><ruby>的<rt>de</rt></ruby><ruby>人<rt>rén</rt></ruby>。</div>
+        <div class="en">Jeremiah said to everyone: My plant has made us happy. We should plant more flowers here, for Dad, and for everyone we miss.</div>
+        <button class="audio-btn" onclick="toggleAudio(this)">🔊</button>
+      </div>
+      <div class="line" data-audio="邻居们欢呼起来。从那天起，他们一起建造了美丽的开花大楼。">
+        <div class="cn"><ruby>邻<rt>lín</rt></ruby><ruby>居<rt>jū</rt></ruby><ruby>们<rt>men</rt></ruby><ruby>欢<rt>huān</rt></ruby><ruby>呼<rt>hū</rt></ruby><ruby>起<rt>qǐ</rt></ruby><ruby>来<rt>lai</rt></ruby>。<ruby>从<rt>cóng</rt></ruby><ruby>那<rt>nà</rt></ruby><ruby>天<rt>tiān</rt></ruby><ruby>起<rt>qǐ</rt></ruby>，<ruby>他<rt>tā</rt></ruby><ruby>们<rt>men</rt></ruby><ruby>一<rt>yì</rt></ruby><ruby>起<rt>qǐ</rt></ruby><ruby>建<rt>jiàn</rt></ruby><ruby>造<rt>zào</rt></ruby><ruby>了<rt>le</rt></ruby><ruby>美<rt>měi</rt></ruby><ruby>丽<rt>lì</rt></ruby><ruby>的<rt>de</rt></ruby><ruby>开<rt>kāi</rt></ruby><ruby>花<rt>huā</rt></ruby><ruby>大<rt>dà</rt></ruby><ruby>楼<rt>lóu</rt></ruby>。</div>
+        <div class="en">The neighbours cheered. From that day on, they built a beautiful Flower Block together.</div>
+        <button class="audio-btn" onclick="toggleAudio(this)">🔊</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // --- Tab Navigation ---
+  const tabs = document.querySelectorAll('nav.tabs button');
+  const panels = document.querySelectorAll('.panel');
+
+  function show(id){
+    panels.forEach(p => p.classList.toggle('active', p.id === id));
+    tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === id));
+    window.scrollTo({top:0, behavior:'smooth'});
+    stopAudio();
+  }
+
+  tabs.forEach(t => t.addEventListener('click', () => show(t.dataset.tab)));
+
+  document.querySelectorAll('.card[data-goto]').forEach(c => {
+    c.addEventListener('click', () => show(c.dataset.goto));
+  });
+
+  // --- Audio Logic (Speech Synthesis) ---
+  let currentUtterance = null;
+  let currentBtn = null;
+
+  function toggleAudio(btn) {
+    const lineDiv = btn.closest('.line');
+    const textToSpeak = lineDiv.getAttribute('data-audio');
+    
+    if (currentBtn === btn && window.speechSynthesis.speaking) {
+      stopAudio();
+      return;
+    }
+    
+    stopAudio();
+    
+    if ('speechSynthesis' in window) {
+      currentUtterance = new SpeechSynthesisUtterance(textToSpeak);
+      currentUtterance.lang = 'zh-CN'; // Set language to Chinese
+      currentUtterance.rate = 0.85; // Slightly slower for learners
+      
+      currentUtterance.onend = function() {
+        btn.classList.remove('playing');
+        btn.innerHTML = '🔊';
+        currentBtn = null;
+        currentUtterance = null;
+      };
+      
+      currentUtterance.onerror = function() {
+        btn.classList.remove('playing');
+        btn.innerHTML = '🔊';
+        currentBtn = null;
+        currentUtterance = null;
+      };
+
+      btn.classList.add('playing');
+      btn.innerHTML = '⏹';
+      currentBtn = btn;
+      
+      window.speechSynthesis.speak(currentUtterance);
+    } else {
+      alert("Sorry, your browser doesn't support text-to-speech.");
+    }
+  }
+
+  function stopAudio() {
+    if (window.speechSynthesis.speaking) {
+      window.speechSynthesis.cancel();
+    }
+    if (currentBtn) {
+      currentBtn.classList.remove('playing');
+      currentBtn.innerHTML = '🔊';
+      currentBtn = null;
+    }
+    currentUtterance = null;
+  }
+
+  // --- Play Entire Scene ---
+  function playScene(storyId, sceneNumber) {
+    const panel = document.getElementById(storyId);
+    const activeScene = panel.querySelectorAll('.scene')[sceneNumber - 1];
+    const lines = activeScene.querySelectorAll('.line');
+    let texts = [];
+    lines.forEach(line => texts.push(line.getAttribute('data-audio')));
+    
+    if (texts.length === 0) return;
+    const fullText = texts.join('。 '); // Join with a slight pause
+    
+    stopAudio();
+    
+    if ('speechSynthesis' in window) {
+      currentUtterance = new SpeechSynthesisUtterance(fullText);
+      currentUtterance.lang = 'zh-CN';
+      currentUtterance.rate = 0.85;
+      window.speechSynthesis.speak(currentUtterance);
+    }
+  }
+
+  // --- QR Code Generation ---
+  const siteUrl = "https://YOUR-USERNAME.github.io/YOUR-REPO-NAME/"; 
+  
+  window.addEventListener('DOMContentLoaded', () => {
+    const qrContainer = document.getElementById('qr-code-container');
+    const qrImg = document.createElement('img');
+    qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(siteUrl)}`;
+    qrImg.alt = "QR Code to website";
+    
+    qrContainer.innerHTML = '';
+    qrContainer.appendChild(qrImg);
+    const textNode = document.createElement('div');
+    textNode.innerText = "Scan for home practice";
+    qrContainer.appendChild(textNode);
+  });
+
+</script>
+</body>
+</html>
